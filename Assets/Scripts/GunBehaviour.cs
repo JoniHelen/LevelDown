@@ -19,7 +19,7 @@ public class GunBehaviour : MonoBehaviour
     bool charging = false;
     public bool canShoot = true;
     const float chargeNeeded = 0.5f;
-    Vector3 dir;
+    Vector3 dir = Vector3.forward;
     Vector3 newDir;
 
     byte chargeState = 0;
@@ -108,11 +108,11 @@ public class GunBehaviour : MonoBehaviour
             dir = rh.point - player.transform.position;
             dir.y = 0;
 
-            float singleStep = turnSpeed * Time.deltaTime;
+            //float singleStep = turnSpeed * Time.deltaTime;
 
-            newDir = Vector3.RotateTowards(transform.forward, dir, singleStep, 0);
+            //newDir = Vector3.RotateTowards(transform.forward, dir, singleStep, 0);
 
-            transform.rotation = Quaternion.LookRotation(newDir);
+            transform.rotation = Quaternion.LookRotation(dir);
         }
     }
 
@@ -122,11 +122,11 @@ public class GunBehaviour : MonoBehaviour
         {
             dir = new Vector3(ctx.ReadValue<Vector2>().x, 0, ctx.ReadValue<Vector2>().y).normalized;
 
-            float singleStep = turnSpeed * Time.deltaTime;
+            //float singleStep = turnSpeed * Time.deltaTime;
 
-            newDir = Vector3.RotateTowards(transform.forward, dir, singleStep, 0);
+            //newDir = Vector3.RotateTowards(transform.forward, dir, singleStep, 0);
 
-            transform.rotation = Quaternion.LookRotation(newDir);
+            transform.rotation = Quaternion.LookRotation(dir);
         }
     }
 
