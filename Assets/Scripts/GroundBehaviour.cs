@@ -44,15 +44,28 @@ public class GroundBehaviour : MonoBehaviour
     IEnumerator Flash()
     {
         float change = amount;
+
+        Color original = rend.material.GetColor("Emission_Color");
+
+        Vector3 flash = new Vector3(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f)).normalized;
+
+        Color flashColor = new Color(flash.x, flash.y, flash.z);
+
+        Color Current;
+
         while (change >= amount - floor)
         {
+            Current = Color.Lerp(flashColor, original, change - floor);
+
             block.SetFloat("Emission_Strength", change * intensity);
+            block.SetColor("Emission_Color", Current);
             rend.SetPropertyBlock(block);
             change -= Time.deltaTime * 7 * floor;
             yield return new WaitForEndOfFrame();
         }
 
         block.SetFloat("Emission_Strength", amount - floor);
+        block.SetColor("Emission_Color", original);
         rend.SetPropertyBlock(block);
     }
 }
