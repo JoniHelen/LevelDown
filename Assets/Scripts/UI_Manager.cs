@@ -45,10 +45,11 @@ public class UI_Manager : MonoBehaviour
             blinking = true;
             StartCoroutine(Blink(HPList[0]));
         }
-
-        if (playerData.hitPoints <= 0)
+        else
         {
             blinking = false;
+            StopCoroutine("Blink");
+            HPList[0].enabled = true;
         }
 
     }

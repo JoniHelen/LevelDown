@@ -89,7 +89,8 @@ public class Projectile : MonoBehaviour
                 if (other.gameObject.CompareTag("Level") && charged)
                 {
                     // Replace taller level with smaller
-                    Instantiate(small, other.transform.position + Vector3.up * -0.5f, Quaternion.Euler(0, 0, 0), GameHandler.instance.currentLevel.transform);
+                    GameObject tm = Instantiate(small, other.transform.position + Vector3.up * -0.5f, Quaternion.Euler(0, 0, 0), GameHandler.instance.currentLevel.transform);
+                    tm.GetComponent<Renderer>().material.SetColor("Emission_Color", other.gameObject.GetComponent<Renderer>().material.GetColor("Emission_Color"));
                     Destroy(other.gameObject);
 
                     // Spawn particles and flash

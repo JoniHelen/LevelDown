@@ -42,19 +42,28 @@ public class PlayerMovement : MonoBehaviour
             AudioHandler.instance.PlaySound("Player_Hurt", audio);
             // Update UI
             GameHandler.instance.uiManager.UpdateHP();
-            StartCoroutine(FlashDamage());
+            StartCoroutine(Flash(Color.red));
         }
     }
 
-    IEnumerator FlashDamage()
+    public void OnHeal()
+    {
+        playerPosition.Heal(1);
+        // PLAY SOUND
+
+        GameHandler.instance.uiManager.UpdateHP();
+        StartCoroutine(Flash(new Color(0, 1, 0.03644657f)));
+    }
+
+    IEnumerator Flash(Color col)
     {
         float amount = 0.75f;
 
         while (amount > 0)
         {
-            Vector3 current = Vector3.Lerp(Vector3.right, Vector3.one, 1 - amount);
+            Color current = Color.Lerp(col, Color.white, 1 - amount);
 
-            block.SetColor("_BaseColor", new Color(current.x, current.y, current.z));
+            block.SetColor("_BaseColor", current);
             rend.SetPropertyBlock(block);
             amount -= Time.deltaTime * 2;
             yield return new WaitForEndOfFrame();

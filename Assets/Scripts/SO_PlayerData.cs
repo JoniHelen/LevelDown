@@ -24,6 +24,11 @@ public class SO_PlayerData : ScriptableObject
         hitPoints = Mathf.Clamp(hitPoints - amount, 0, 10);
     }
 
+    public void Heal(int amount)
+    {
+        hitPoints = Mathf.Clamp(hitPoints + amount, 0, 10);
+    }
+
     public void SetHitPoints(int amount)
     {
         hitPoints = amount;

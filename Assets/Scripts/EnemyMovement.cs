@@ -9,6 +9,7 @@ public class EnemyMovement : MonoBehaviour
     [SerializeField] Projectile projectile;
     [SerializeField] SO_PlayerData playerData;
     [SerializeField] GameObject enemyDeath;
+    [SerializeField] GameObject pickup;
     [SerializeField] AudioSource audio;
 
     bool inRange = false;
@@ -139,6 +140,11 @@ public class EnemyMovement : MonoBehaviour
         agent.isStopped = true;
         GameObject death = Instantiate(enemyDeath, transform.position, Quaternion.Euler(0, 0, 0));
         Destroy(death, 1f);
+
+        int rnd = Random.Range(0, 5) + 1;
+
+        if (rnd == 5) 
+            Instantiate(pickup, transform.position, Quaternion.identity);
 
         GameHandler.instance.RemoveEnemy(gameObject);
 

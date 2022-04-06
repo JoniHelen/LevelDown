@@ -40,6 +40,10 @@ public class GenerateLevel : MonoBehaviour
 
         Vector2Int pOffset = PlayerOffset(rnd);
 
+        Vector3 temp = new Vector3(Random.value, Random.value, Random.value).normalized;
+
+        Color rndColor = new Color(temp.x, temp.y, temp.z);
+
         for (int x = 1; x < width - 1; x++)
         {
             for (int y = 1; y < height - 1; y++)
@@ -51,11 +55,13 @@ public class GenerateLevel : MonoBehaviour
 
                 if (perlin > Mathf.Clamp(threshold, 0, 1))
                 {
-                    Instantiate(large, transform.position + new Vector3(x + offsetX, 1, y + offsetY), Quaternion.Euler(0, 0, 0), transform);
+                    GameObject l = Instantiate(large, transform.position + new Vector3(x + offsetX, 1, y + offsetY), Quaternion.Euler(0, 0, 0), transform);
+                    l.GetComponent<Renderer>().material.SetColor("Emission_Color", rndColor);
                 }
                 else
                 {
-                    Instantiate(small, transform.position + new Vector3(x + offsetX, 0.5f, y + offsetY), Quaternion.Euler(0, 0, 0), transform);
+                    GameObject s = Instantiate(small, transform.position + new Vector3(x + offsetX, 0.5f, y + offsetY), Quaternion.Euler(0, 0, 0), transform);
+                    s.GetComponent<Renderer>().material.SetColor("Emission_Color", rndColor);
                     EnemyPos.Add(new Vector2Int(x, y), false);
                 }
             }

@@ -26,9 +26,24 @@ public class GroundBehaviour : MonoBehaviour
     {
         rb.useGravity = true;
         rb.isKinematic = false;
+
+        Color original = rend.material.GetColor("Emission_Color");
+
+        Vector3 flash = new Vector3(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f)).normalized;
+
+        Color flashColor = new Color(flash.x, flash.y, flash.z);
+
+        Color Current;
+
         float t = 0;
         while (t < 1)
         {
+            Current = Color.Lerp(flashColor, original, t);
+
+            block.SetFloat("Emission_Strength", (1 - t) * intensity);
+            block.SetColor("Emission_Color", Current);
+            rend.SetPropertyBlock(block);
+
             t += Time.deltaTime;
             transform.localScale = Vector3.Lerp(Vector3.one, Vector3.zero, t);
             yield return new WaitForEndOfFrame();

@@ -176,6 +176,7 @@ MonoBehaviour:
   projectile: {fileID: 7693313034771052463, guid: d0bf1e656a7c0894e94cd934f8a87adc, type: 3}
   playerData: {fileID: 11400000, guid: fbca57ef320c6b14287f8ef8b2690eaf, type: 2}
   enemyDeath: {fileID: 3196442147515152247, guid: 8e1c0ca1d11231f4590c4f2909134f04, type: 3}
+  pickup: {fileID: 5039041659291292911, guid: 2154adc5b67717246a6d932da002b004, type: 3}
   audio: {fileID: 3376585398531851937}
   layerMask:
     serializedVersion: 2
