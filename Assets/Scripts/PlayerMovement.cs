@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,6 +15,19 @@ public class PlayerMovement : MonoBehaviour
     MaterialPropertyBlock block;
     Renderer rend;
     public bool canTakeDamage = true;
+
+    public List<PickupData> pickups = new List<PickupData>();
+
+    [Flags]
+    public enum PowerupMask
+    {
+        None,
+        Multishot,
+        DamageBoost
+    }
+
+    public PowerupMask powerupMask = PowerupMask.None;
+
     private void Awake()
     {
         characterController = gameObject.GetComponent<CharacterController>();
@@ -25,8 +39,21 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        characterController.Move((dir + Physics.gravity) * Time.deltaTime * speed);
+        characterController.Move(speed * Time.deltaTime * (dir + Physics.gravity));
         playerPosition.SetPosition(transform.position);
+
+
+        foreach(PickupData p in pickups)
+        {
+            p.activeTime += Time.deltaTime;
+
+            if (p.activeTime >= p.Duration)
+            {
+                TogglePickupOff(p);
+                pickups.Remove(p);
+                break;
+            }
+        }
     }
 
     public void SetPosition()
@@ -53,6 +80,43 @@ public class PlayerMovement : MonoBehaviour
 
         GameHandler.instance.uiManager.UpdateHP();
         StartCoroutine(Flash(new Color(0, 1, 0.03644657f)));
+    }
+
+    public void OnPickupPowerup(PickupData pickup)
+    {
+        if (pickups.Exists(x => x.Type == pickup.Type))
+            pickups.Find(x => x.Type == pickup.Type).activeTime = 0;
+        else
+        {
+            pickups.Add(pickup);
+            TogglePickupOn(pickup);
+        }
+    }
+
+    void TogglePickupOn(PickupData pickup)
+    {
+        switch (pickup.Type)
+        {
+            case Pickup.PickupType.Multishot:
+                powerupMask |= PowerupMask.Multishot;
+                break;
+            case Pickup.PickupType.DamageBoost:
+                powerupMask |= PowerupMask.DamageBoost;
+                break;
+        }
+    }
+
+    void TogglePickupOff(PickupData pickup)
+    {
+        switch (pickup.Type)
+        {
+            case Pickup.PickupType.Multishot:
+                powerupMask ^= PowerupMask.Multishot;
+                break;
+            case Pickup.PickupType.DamageBoost:
+                powerupMask ^= PowerupMask.DamageBoost;
+                break;
+        }
     }
 
     IEnumerator Flash(Color col)

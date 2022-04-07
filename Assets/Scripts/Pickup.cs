@@ -4,36 +4,41 @@ using UnityEngine;
 
 public class Pickup : MonoBehaviour
 {
-    public enum PickupType { HP }
+    public enum PickupType { HP, Multishot, DamageBoost }
 
     public PickupType type;
-    [SerializeField] SO_PlayerData playerData;
 
-    Vector3 originalPos;
+    public float Duration;
+    [HideInInspector] public float activeTime = 0;
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            switch (type)
+            if (type == PickupType.HP)
             {
-                case PickupType.HP:
-                    other.gameObject.GetComponent<PlayerMovement>().OnHeal();
-                    Destroy(gameObject);
-                    break;
-                default:
-                    break;
+                other.gameObject.GetComponent<PlayerMovement>().OnHeal();
+                Destroy(gameObject);
+            }
+            else
+            {
+                other.gameObject.GetComponent<PlayerMovement>().OnPickupPowerup(new PickupData(Duration, type));
+                Destroy(gameObject);
             }
         }
     }
 
-    private void Awake()
+    public void OnLevelDown()
     {
-        originalPos = transform.position;
-    }
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position, GetComponent<SphereCollider>().radius * transform.localScale.z, Camera.main.transform.forward, Mathf.Infinity);
 
-    private void Update()
-    {
-        transform.position = originalPos + Mathf.Sin(Time.time * 4) * Vector3.forward / 4;  
+        foreach (RaycastHit hit in hits)
+        {
+            if(hit.transform.localScale.y == 2)
+            {
+                Destroy(gameObject);
+                break;
+            }
+        }
     }
 }

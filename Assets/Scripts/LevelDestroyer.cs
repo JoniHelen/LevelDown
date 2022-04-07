@@ -31,5 +31,9 @@ public class LevelDestroyer : MonoBehaviour
         {
             other.gameObject.GetComponent<GroundBehaviour>().StartDestruction();
         }
+        else if (other.gameObject.CompareTag("Pickup"))
+        {
+            other.gameObject.GetComponent<Pickup>().OnLevelDown();
+        }
     }
 }

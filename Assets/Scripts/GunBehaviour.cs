@@ -22,7 +22,12 @@ public class GunBehaviour : MonoBehaviour
     Vector3 dir = Vector3.forward;
     Vector3 newDir;
 
+    bool shooting = false;
+    [SerializeField] float rateOfFire = 0.2f;
+    float fireTimer = 0;
+
     byte chargeState = 0;
+
     // Update is called once per frame
     void Update()
     {
@@ -60,6 +65,17 @@ public class GunBehaviour : MonoBehaviour
             }
         }
 
+        if (shooting && canShoot)
+        {
+            fireTimer += Time.deltaTime;
+
+            if(fireTimer >= rateOfFire)
+            {
+                Shoot();
+                fireTimer = 0;
+            }
+        }
+
         if (charge == 0)
         {
             chargeState = 0;
@@ -71,27 +87,62 @@ public class GunBehaviour : MonoBehaviour
         }
     }
 
+    void Shoot()
+    {
+        PlayerMovement.PowerupMask multi = PlayerMovement.PowerupMask.Multishot;
+        PlayerMovement.PowerupMask dmg = PlayerMovement.PowerupMask.DamageBoost;
+
+        Projectile p1 = Instantiate(projectile, gun.transform.position, Quaternion.Euler(0, 0, 0));
+        p1.direction = dir.normalized;
+        p1.rotation = Vector3.zero;
+
+        if ((player.GetComponent<PlayerMovement>().powerupMask & multi) == multi)
+        {
+            Projectile p2 = Instantiate(projectile, gun.transform.position, Quaternion.Euler(0, 0, 0));
+            p2.direction = Quaternion.AngleAxis(17.5f, Vector3.up) * dir.normalized;
+            p2.rotation = Vector3.zero;
+
+            Projectile p3 = Instantiate(projectile, gun.transform.position, Quaternion.Euler(0, 0, 0));
+            p3.direction = Quaternion.AngleAxis(-17.5f, Vector3.up) * dir.normalized;
+            p3.rotation = Vector3.zero;
+        }
+
+        if ((player.GetComponent<PlayerMovement>().powerupMask & (dmg | multi)) == (dmg | multi))
+        {
+            //MOAR DMG
+        }
+        else if ((player.GetComponent<PlayerMovement>().powerupMask & dmg) == dmg)
+        {
+
+        }
+
+        AudioHandler.instance.PlaySound("Player_Shoot", audio);
+    }
+
     public void PrimaryFire(InputAction.CallbackContext ctx)
     {
-        if (ctx.performed && canShoot && charge == 0)
+        if (ctx.started && canShoot && charge == 0)
         {
-            Projectile obj = Instantiate(projectile, gun.transform.position, Quaternion.Euler(0, 0, 0));
-            obj.direction = dir.normalized;
-            obj.rotation = Vector3.zero;
+            shooting = true;
+            Shoot();
+        }
 
-            AudioHandler.instance.PlaySound("Player_Shoot", audio);
+        if (ctx.canceled)
+        {
+            shooting = false;
+            fireTimer = 0;
         }
     }
 
     public void AlternateFire(InputAction.CallbackContext ctx)
     {
-        if (ctx.started && playerData.charges > 0 && canShoot)
+        if (ctx.started && playerData.charges > 0 && canShoot && !shooting)
         {
             charging = true;
             ChargeEffect.Play();
         }
         
-        if (ctx.canceled && playerData.charges > 0 && canShoot)
+        if (ctx.canceled && playerData.charges > 0)
         {
             charging = false;
             ChargeEffect.Stop();
@@ -108,10 +159,6 @@ public class GunBehaviour : MonoBehaviour
             dir = rh.point - player.transform.position;
             dir.y = 0;
 
-            //float singleStep = turnSpeed * Time.deltaTime;
-
-            //newDir = Vector3.RotateTowards(transform.forward, dir, singleStep, 0);
-
             transform.rotation = Quaternion.LookRotation(dir);
         }
     }
@@ -121,10 +168,6 @@ public class GunBehaviour : MonoBehaviour
         if (ctx.ReadValue<Vector2>() != Vector2.zero)
         {
             dir = new Vector3(ctx.ReadValue<Vector2>().x, 0, ctx.ReadValue<Vector2>().y).normalized;
-
-            //float singleStep = turnSpeed * Time.deltaTime;
-
-            //newDir = Vector3.RotateTowards(transform.forward, dir, singleStep, 0);
 
             transform.rotation = Quaternion.LookRotation(dir);
         }

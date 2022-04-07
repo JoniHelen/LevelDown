@@ -1509,6 +1509,7 @@ MonoBehaviour:
   speed: 10
   audio: {fileID: 1158690724}
   canTakeDamage: 1
+  powerupMask: 0
 --- !u!108 &1158690722
 Light:
   m_ObjectHideFlags: 0
@@ -3463,6 +3464,7 @@ MonoBehaviour:
     m_Bits: 128
   audio: {fileID: 2110791893}
   canShoot: 1
+  rateOfFire: 0.2
 --- !u!82 &2110791893
 AudioSource:
   m_ObjectHideFlags: 0
