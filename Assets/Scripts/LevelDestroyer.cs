@@ -35,5 +35,9 @@ public class LevelDestroyer : MonoBehaviour
         {
             other.gameObject.GetComponent<Pickup>().OnLevelDown();
         }
+        else if (other.gameObject.CompareTag("EnemyProj"))
+        {
+            Destroy(other.gameObject);
+        }
     }
 }

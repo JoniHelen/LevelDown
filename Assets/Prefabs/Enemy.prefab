@@ -179,6 +179,7 @@ MonoBehaviour:
   pickups:
   - {fileID: 5039041659291292911, guid: 2154adc5b67717246a6d932da002b004, type: 3}
   - {fileID: 1725254304979535542, guid: fb491e2095f407641b0d81d419319f67, type: 3}
+  impulse: {fileID: 0}
   audio: {fileID: 3376585398531851937}
   layerMask:
     serializedVersion: 2

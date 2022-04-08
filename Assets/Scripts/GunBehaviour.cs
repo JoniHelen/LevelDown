@@ -28,6 +28,8 @@ public class GunBehaviour : MonoBehaviour
 
     byte chargeState = 0;
 
+    List<Projectile> projectiles = new List<Projectile>();
+
     // Update is called once per frame
     void Update()
     {
@@ -89,34 +91,63 @@ public class GunBehaviour : MonoBehaviour
 
     void Shoot()
     {
-        PlayerMovement.PowerupMask multi = PlayerMovement.PowerupMask.Multishot;
-        PlayerMovement.PowerupMask dmg = PlayerMovement.PowerupMask.DamageBoost;
+        switch (player.GetComponent<PlayerMovement>().powerupMask)
+        {
+            case (PlayerMovement.PowerupMask)1:
+                InitProjectiles(true);
+                break;
+            case (PlayerMovement.PowerupMask)2:
+                InitProjectiles(false);
+                BuffDamage();
+                break;
+            case (PlayerMovement.PowerupMask)3:
+                InitProjectiles(true);
+                BuffDamage();
+                break;
+            default:
+                InitProjectiles(false);
+                break;
+        }
+
+        AudioHandler.instance.PlaySound("Player_Shoot", audio);
+    }
+
+    void BuffDamage()
+    {
+        foreach(Projectile p in projectiles)
+        {
+            p.damage = 3;
+        }
+    }
+
+    void InitProjectiles(bool multi)
+    {
+        projectiles.Clear();
 
         Projectile p1 = Instantiate(projectile, gun.transform.position, Quaternion.Euler(0, 0, 0));
         p1.direction = dir.normalized;
         p1.rotation = Vector3.zero;
 
-        if ((player.GetComponent<PlayerMovement>().powerupMask & multi) == multi)
+        if (multi)
         {
+            p1.shake = true;
+
             Projectile p2 = Instantiate(projectile, gun.transform.position, Quaternion.Euler(0, 0, 0));
             p2.direction = Quaternion.AngleAxis(17.5f, Vector3.up) * dir.normalized;
             p2.rotation = Vector3.zero;
+            p2.shake = true;
+
+            projectiles.Add(p2);
 
             Projectile p3 = Instantiate(projectile, gun.transform.position, Quaternion.Euler(0, 0, 0));
             p3.direction = Quaternion.AngleAxis(-17.5f, Vector3.up) * dir.normalized;
             p3.rotation = Vector3.zero;
+            p3.shake = true;
+
+            projectiles.Add(p3);
         }
 
-        if ((player.GetComponent<PlayerMovement>().powerupMask & (dmg | multi)) == (dmg | multi))
-        {
-            //MOAR DMG
-        }
-        else if ((player.GetComponent<PlayerMovement>().powerupMask & dmg) == dmg)
-        {
-
-        }
-
-        AudioHandler.instance.PlaySound("Player_Shoot", audio);
+        projectiles.Add(p1);
     }
 
     public void PrimaryFire(InputAction.CallbackContext ctx)

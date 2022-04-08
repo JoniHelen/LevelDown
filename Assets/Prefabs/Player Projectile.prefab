@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 5859752610914448421}
   - component: {fileID: 1390171780108724700}
   - component: {fileID: 8705236410082741270}
+  - component: {fileID: -4972075619848834684}
   m_Layer: 0
   m_Name: Player Projectile
   m_TagString: PlayerProj
@@ -163,12 +164,14 @@ MonoBehaviour:
   rotation: {x: 0, y: 0, z: 0}
   speed: 20
   charged: 0
+  shake: 0
+  damage: 1
   playerExplosion: {fileID: 3196442147515152247, guid: 9a7666a557bcd9244aa4493ff0885123, type: 3}
   enemyExplosion: {fileID: 3196442147515152247, guid: 8927641388814ea4d853d876013f5d9e, type: 3}
   small: {fileID: 7766773545928228456, guid: b2522a8776161e341906787f2787d579, type: 3}
   flash: {fileID: 2206951597108570127, guid: e46feeecc65f4e241a22d1b0ec7e3299, type: 3}
+  impulse: {fileID: -4972075619848834684}
   playerData: {fileID: 11400000, guid: fbca57ef320c6b14287f8ef8b2690eaf, type: 2}
-  audio: {fileID: 0}
 --- !u!135 &1390171780108724700
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -198,3 +201,81 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &-4972075619848834684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5971983377796921751}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 180ecf9b41d478f468eb3e9083753217, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ImpulseDefinition:
+    m_ImpulseChannel: 1
+    m_RawSignal: {fileID: 11400000, guid: e6fa9303152d30940a801714538603c4, type: 2}
+    m_AmplitudeGain: 1
+    m_FrequencyGain: 0.5
+    m_RepeatMode: 0
+    m_Randomize: 1
+    m_TimeEnvelope:
+      m_AttackShape:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 34
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 34
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      m_DecayShape:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      m_AttackTime: 0
+      m_SustainTime: 0.1
+      m_DecayTime: 0.2
+      m_ScaleWithImpact: 0
+      m_HoldForever: 0
+    m_ImpactRadius: 10000
+    m_DirectionMode: 0
+    m_DissipationMode: 2
+    m_DissipationDistance: 1000000
+    m_PropagationSpeed: 343

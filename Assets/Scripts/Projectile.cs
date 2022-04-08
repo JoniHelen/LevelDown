@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 using UnityEngine.AI;
 public class Projectile : MonoBehaviour
 {
@@ -8,11 +9,14 @@ public class Projectile : MonoBehaviour
     public Vector3 rotation = Vector3.zero;
     public float speed;
     public bool charged;
+    public bool shake;
+    public int damage = 1;
 
     [SerializeField] GameObject playerExplosion;
     [SerializeField] GameObject enemyExplosion;
     [SerializeField] GameObject small;
     [SerializeField] GameObject flash;
+    [SerializeField] CinemachineImpulseSource impulse;
     [SerializeField] SO_PlayerData playerData;
 
     bool damageDealt = false;
@@ -68,13 +72,15 @@ public class Projectile : MonoBehaviour
                 {
                     f.GetComponent<ColorExplosion>().charged = true;
                     // Enemy takes damage
-                    other.gameObject.GetComponent<EnemyMovement>().TakeDamage(3, direction, charged);
+                    impulse.GenerateImpulse(0.7f);
+                    other.gameObject.GetComponent<EnemyMovement>().TakeDamage(damage + 3, direction, charged);
                 }
                 else
                 {
                     f.GetComponent<ColorExplosion>().charged = false;
                     // Enemy takes damage
-                    other.gameObject.GetComponent<EnemyMovement>().TakeDamage(1, direction, charged);
+                    if (shake) impulse.GenerateImpulse(0.1f);
+                    other.gameObject.GetComponent<EnemyMovement>().TakeDamage(damage, direction, charged);
                 }
 
                 // Spawn player particles and destroy them with self
@@ -88,6 +94,7 @@ public class Projectile : MonoBehaviour
                 // if the projectile didn't hit a wall and was charged
                 if (other.gameObject.CompareTag("Level") && charged)
                 {
+                    impulse.GenerateImpulse(0.7f);
                     // Replace taller level with smaller
                     GameObject tm = Instantiate(small, other.transform.position + Vector3.up * -0.5f, Quaternion.Euler(0, 0, 0), GameHandler.instance.currentLevel.transform);
                     tm.GetComponent<Renderer>().material.SetColor("Emission_Color", other.gameObject.GetComponent<Renderer>().material.GetColor("Emission_Color"));
@@ -115,10 +122,12 @@ public class Projectile : MonoBehaviour
                     // Determine charged state
                     if (charged)
                     {
+                        impulse.GenerateImpulse(0.7f);
                         f.GetComponent<ColorExplosion>().charged = true;
                     }
                     else
                     {
+                        if (shake) impulse.GenerateImpulse(0.1f);
                         f.GetComponent<ColorExplosion>().charged = false;
                     }
 
