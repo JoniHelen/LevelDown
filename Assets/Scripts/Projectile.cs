@@ -50,6 +50,9 @@ public class Projectile : MonoBehaviour
             }
             else if (other.gameObject.CompareTag("Level") || other.gameObject.CompareTag("Wall")) // If projectile hits level
             {
+                other.gameObject.TryGetComponent(out GroundBehaviour gb);
+                if (gb != null) gb.FlashColor(Color.red);
+
                 // Spawn explosion
                 GameObject obj = Instantiate(enemyExplosion, transform.position, Quaternion.Euler(0, 0, 0));
                 // Destroy explosion and self
@@ -79,7 +82,7 @@ public class Projectile : MonoBehaviour
                 {
                     f.GetComponent<ColorExplosion>().charged = false;
                     // Enemy takes damage
-                    if (shake) impulse.GenerateImpulse(0.1f);
+                    /*if (shake)*/ impulse.GenerateImpulse(0.2f);
                     other.gameObject.GetComponent<EnemyMovement>().TakeDamage(damage, direction, charged);
                 }
 
@@ -127,7 +130,7 @@ public class Projectile : MonoBehaviour
                     }
                     else
                     {
-                        if (shake) impulse.GenerateImpulse(0.1f);
+                        if (shake) impulse.GenerateImpulse(0.2f);
                         f.GetComponent<ColorExplosion>().charged = false;
                     }
 

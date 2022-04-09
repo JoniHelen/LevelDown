@@ -111,7 +111,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   intensity: 15
   amount: 4
-  floor: 2.25
+  floor: 2
 --- !u!54 &-4337284509853381154
 Rigidbody:
   m_ObjectHideFlags: 0

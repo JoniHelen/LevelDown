@@ -53,18 +53,22 @@ public class GroundBehaviour : MonoBehaviour
 
     public void FlashColor()
     {
-        StartCoroutine(Flash());
+        Vector3 flash = new Vector3(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f)).normalized;
+
+        Color flashColor = new Color(flash.x, flash.y, flash.z);
+        StartCoroutine(Flash(flashColor));
     }
 
-    IEnumerator Flash()
+    public void FlashColor(Color col)
+    {
+        StartCoroutine(Flash(col));
+    }
+
+    IEnumerator Flash(Color flashColor)
     {
         float change = amount;
 
         Color original = rend.material.GetColor("Emission_Color");
-
-        Vector3 flash = new Vector3(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f)).normalized;
-
-        Color flashColor = new Color(flash.x, flash.y, flash.z);
 
         Color Current;
 
