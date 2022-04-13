@@ -30,7 +30,7 @@ public class Pickup : MonoBehaviour
 
     public void OnLevelDown()
     {
-        RaycastHit[] hits = Physics.SphereCastAll(transform.position, GetComponent<SphereCollider>().radius * transform.localScale.z, Camera.main.transform.forward, Mathf.Infinity);
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position + Vector3.down * 2, GetComponent<SphereCollider>().radius * transform.localScale.z, Camera.main.transform.forward, Mathf.Infinity);
 
         foreach (RaycastHit hit in hits)
         {

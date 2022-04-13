@@ -14,6 +14,8 @@ public class UI_Manager : MonoBehaviour
     Image[] HPList;
     Image[] ChargesList;
 
+    Coroutine BlinkCo;
+
     bool blinking = false;
     // Start is called before the first frame update
     void Start()
@@ -43,15 +45,20 @@ public class UI_Manager : MonoBehaviour
         if (playerData.hitPoints == 1)
         {
             blinking = true;
-            StartCoroutine(Blink(HPList[0]));
+            BlinkCo = StartCoroutine(Blink(HPList[0]));
         }
-        else
+        else if (playerData.hitPoints != 0 && blinking)
         {
             blinking = false;
-            StopCoroutine("Blink");
+            StopCoroutine(BlinkCo);
             HPList[0].enabled = true;
         }
-
+        else if (blinking)
+        {
+            blinking = false;
+            StopCoroutine(BlinkCo);
+            HPList[0].enabled = false;
+        }
     }
 
     public void UpdateCharges()

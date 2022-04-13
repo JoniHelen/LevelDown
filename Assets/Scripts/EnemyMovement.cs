@@ -138,7 +138,9 @@ public class EnemyMovement : MonoBehaviour
 
     void Die()
     {
-        agent.isStopped = true;
+        if (!agent.isStopped)
+            agent.isStopped = true;
+
         GameObject death = Instantiate(enemyDeath, transform.position, Quaternion.Euler(0, 0, 0));
         Destroy(death, 1f);
 

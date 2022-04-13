@@ -93,19 +93,19 @@ public class GunBehaviour : MonoBehaviour
     {
         switch (player.GetComponent<PlayerMovement>().powerupMask)
         {
-            case (PlayerMovement.PowerupMask)1:
+            case (PlayerMovement.PowerupMask)1: // Multishot
                 InitProjectiles(true);
                 break;
-            case (PlayerMovement.PowerupMask)2:
+            case (PlayerMovement.PowerupMask)2: // Damage boost
                 InitProjectiles(false);
                 BuffDamage();
                 break;
-            case (PlayerMovement.PowerupMask)3:
+            case (PlayerMovement.PowerupMask)3: // Multishot & Damage boost
                 InitProjectiles(true);
                 BuffDamage();
                 break;
             default:
-                InitProjectiles(false);
+                InitProjectiles(false); // No powerup
                 break;
         }
 

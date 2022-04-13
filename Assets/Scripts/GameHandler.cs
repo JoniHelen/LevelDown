@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.AI;
+using UnityEngine.InputSystem;
 
 public class GameHandler : MonoBehaviour
 {
@@ -28,6 +29,7 @@ public class GameHandler : MonoBehaviour
     public bool levelCreated = false;
     public bool themePlaying = false;
     public int levelNumber = 0;
+    public bool Paused = false;
 
     public GameObject player;
     public GameObject gun;
@@ -167,6 +169,27 @@ public class GameHandler : MonoBehaviour
             uiManager.UpdateCharges();
             AudioHandler.instance.PlaySound("Gain_Charge", ChargeBlip, 0.7f + playerData.charges / 10f);
             yield return new WaitForSeconds(0.2f);
+        }
+    }
+
+    public void TogglePauseGame()
+    {
+        if (!Paused)
+        {
+            Paused = true;
+            player.GetComponent<PlayerInput>().DeactivateInput();
+            audio.Pause();
+            Time.timeScale = 0;
+        }
+        else
+        {
+            player.GetComponent<PlayerInput>().ActivateInput();
+            Paused = false;
+            if (audio.time > 0)
+            {
+                audio.Play();
+            }
+            Time.timeScale = 1;
         }
     }
 
