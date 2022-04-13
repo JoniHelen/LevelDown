@@ -52,12 +52,12 @@
                 },
                 {
                     "name": "Pause",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "8484fda9-aa52-4932-95bf-1f9e01cceaf9",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -240,7 +240,7 @@
                 {
                     "name": "",
                     "id": "844a697b-7932-441c-89ca-924ff9e6a101",
-                    "path": "<Keyboard>/escape",
+                    "path": "<Keyboard>/p",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",

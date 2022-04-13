@@ -174,6 +174,7 @@ public class GameHandler : MonoBehaviour
 
     public void TogglePauseGame()
     {
+        Debug.Log(Paused);
         if (!Paused)
         {
             Paused = true;
@@ -193,14 +194,38 @@ public class GameHandler : MonoBehaviour
         }
     }
 
+    public void TogglePauseGame(InputAction.CallbackContext ctx)
+    {
+        if (ctx.started)
+        {
+            if (!Paused)
+            {
+                Paused = true;
+                player.GetComponent<PlayerInput>().DeactivateInput();
+                audio.Pause();
+                Time.timeScale = 0;
+            }
+            else
+            {
+                player.GetComponent<PlayerInput>().ActivateInput();
+                Paused = false;
+                if (audio.time > 0)
+                {
+                    audio.Play();
+                }
+                Time.timeScale = 1;
+            }
+        }
+    }
+
     private void OnApplicationFocus(bool focus)
     {
-        if (!focus)
+        if (!focus && !Paused)
         {
             audio.Pause();
             Time.timeScale = 0;
         }
-        else
+        else if (!Paused)
         {
             if (audio.time > 0)
             {
