@@ -174,7 +174,6 @@ public class GameHandler : MonoBehaviour
 
     public void TogglePauseGame()
     {
-        Debug.Log(Paused);
         if (!Paused)
         {
             Paused = true;
