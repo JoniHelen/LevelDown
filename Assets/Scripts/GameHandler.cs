@@ -4,15 +4,18 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.DualShock;
 
 public class GameHandler : MonoBehaviour
 {
     [SerializeField] GameObject level;
     [SerializeField] GameObject wall;
     [SerializeField] GameObject transition;
+    [SerializeField] Material screenGlitch;
     [SerializeField] SO_PlayerData playerData;
     public AudioSource audio;
     [SerializeField] AudioSource ChargeBlip;
+    [SerializeField] GameObject endScreen;
 
     [SerializeField] int width;
     [SerializeField] int height;
@@ -43,6 +46,7 @@ public class GameHandler : MonoBehaviour
         Cursor.lockState = CursorLockMode.Confined;
         AudioHandler.instance.PlaySound("Start_Noise", audio);
         playerData.SetHitPoints(10);
+        SetGlitchAmount(0.0025f);
         GenerateWalls();
         levelCreated = true;
         player.GetComponent<PlayerMovement>().enabled = false;
@@ -75,6 +79,89 @@ public class GameHandler : MonoBehaviour
                 time = 0;
             }
         }
+    }
+
+    public void LargeRumble()
+    {
+        StartCoroutine(RumbleForSeconds(0.15f, true));
+    }
+
+    public void SmallRumble()
+    {
+        StartCoroutine(RumbleForSeconds(0.15f, false));
+    }
+
+    IEnumerator RumbleForSeconds(float time, bool intense)
+    {
+        float elapsed = 0;
+
+        if (intense)
+        {
+            Gamepad.current.SetMotorSpeeds(1f, 1f);
+        }
+        else
+        {
+            Gamepad.current.SetMotorSpeeds(0.25f, 0.25f);
+        }
+
+        while (elapsed < time)
+        {
+            elapsed += Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
+
+        Gamepad.current.SetMotorSpeeds(0,0);
+    }
+
+    IEnumerator FlashGlitch()
+    {
+        float original = screenGlitch.GetFloat("Intensity");
+        float peak = 0.1f;
+
+        float delta = peak - original;
+
+        float duration = 1f;
+
+        while (duration > 0)
+        {
+            screenGlitch.SetFloat("Intensity", original + delta * duration);
+            duration -= Time.deltaTime * 10;
+            yield return new WaitForEndOfFrame();
+        }
+
+        screenGlitch.SetFloat("Intensity", original);
+    }
+
+    IEnumerator GameOver()
+    {
+        float time = 1f;
+
+        while (time > 0)
+        {
+            Time.timeScale = time;
+            audio.pitch = time;
+            time -= Time.unscaledDeltaTime;
+            yield return new WaitForEndOfFrame();
+        }
+        Time.timeScale = 0;
+        audio.Pause();
+        endScreen.SetActive(true);
+    }
+
+    public void EndGame()
+    {
+        player.GetComponent<PlayerInput>().DeactivateInput();
+        StartCoroutine(GameOver());
+    }
+
+    public void SetGlitchAmount(float amount)
+    {
+        screenGlitch.SetFloat("Intensity", amount);
+    }
+
+    public void FlashScreenGlitch()
+    {
+        StartCoroutine(FlashGlitch());
     }
 
     public void PlayTheme()

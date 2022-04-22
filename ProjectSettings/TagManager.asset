@@ -10,6 +10,7 @@ TagManager:
   - PlayerProj
   - Wall
   - EnemyRange
+  - Pickup
   layers:
   - Default
   - TransparentFX
@@ -19,7 +20,7 @@ TagManager:
   - UI
   - WalkableArea
   - RayCatch
-  - 
+  - No PP
   - 
   - 
   - 

@@ -8,6 +8,7 @@ public class PlayerMovement : MonoBehaviour
 {
     CharacterController characterController;
     [SerializeField] SO_PlayerData playerPosition;
+    [SerializeField] GameObject death;
     [SerializeField] float speed;
     [SerializeField] AudioSource audio;
     Vector3 dir = Vector3.zero;
@@ -66,16 +67,27 @@ public class PlayerMovement : MonoBehaviour
         if (canTakeDamage)
         {
             playerPosition.TakeDamage(1);
+            GameHandler.instance.SetGlitchAmount((-1f / 72f) * (playerPosition.hitPoints / 10f) + (59f / 3600f));
+            GameHandler.instance.FlashScreenGlitch();  
             AudioHandler.instance.PlaySound("Player_Hurt", audio);
             // Update UI
             GameHandler.instance.uiManager.UpdateHP();
             StartCoroutine(Flash(Color.red));
+
+            if (playerPosition.hitPoints == 0)
+            {
+                Instantiate(death, gameObject.transform.position, Quaternion.identity);
+                GetComponent<Renderer>().enabled = false;
+                transform.GetChild(0).gameObject.SetActive(false);
+                GameHandler.instance.EndGame();
+            }
         }
     }
 
     public void OnHeal()
     {
         playerPosition.Heal(1);
+        GameHandler.instance.SetGlitchAmount((-1f / 72f) * (playerPosition.hitPoints / 10f) + (59f / 3600f));
         // PLAY SOUND
 
         GameHandler.instance.uiManager.UpdateHP();

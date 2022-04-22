@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 using UnityEngine.AI;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.DualShock;
 public class Projectile : MonoBehaviour
 {
     public Vector3 direction = Vector3.zero;
@@ -36,6 +38,8 @@ public class Projectile : MonoBehaviour
             if (other.gameObject.CompareTag("Player") && !damageDealt)
             {
                 // Player takes damage
+                impulse.GenerateImpulse(0.7f);
+                GameHandler.instance.LargeRumble();
                 damageDealt = true;
 
                 // Play damage animation and take damage
@@ -76,6 +80,7 @@ public class Projectile : MonoBehaviour
                     f.GetComponent<ColorExplosion>().charged = true;
                     // Enemy takes damage
                     impulse.GenerateImpulse(0.7f);
+                    GameHandler.instance.LargeRumble();
                     other.gameObject.GetComponent<EnemyMovement>().TakeDamage(damage + 3, direction, charged);
                 }
                 else
@@ -83,6 +88,7 @@ public class Projectile : MonoBehaviour
                     f.GetComponent<ColorExplosion>().charged = false;
                     // Enemy takes damage
                     /*if (shake)*/ impulse.GenerateImpulse(0.2f);
+                    GameHandler.instance.SmallRumble();
                     other.gameObject.GetComponent<EnemyMovement>().TakeDamage(damage, direction, charged);
                 }
 
@@ -98,6 +104,8 @@ public class Projectile : MonoBehaviour
                 if (other.gameObject.CompareTag("Level") && charged)
                 {
                     impulse.GenerateImpulse(0.7f);
+                    GameHandler.instance.LargeRumble();
+
                     // Replace taller level with smaller
                     GameObject tm = Instantiate(small, other.transform.position + Vector3.up * -0.5f, Quaternion.Euler(0, 0, 0), GameHandler.instance.currentLevel.transform);
                     tm.GetComponent<Renderer>().material.SetColor("Emission_Color", other.gameObject.GetComponent<Renderer>().material.GetColor("Emission_Color"));
@@ -126,11 +134,16 @@ public class Projectile : MonoBehaviour
                     if (charged)
                     {
                         impulse.GenerateImpulse(0.7f);
+                        GameHandler.instance.LargeRumble();
                         f.GetComponent<ColorExplosion>().charged = true;
                     }
                     else
                     {
-                        if (shake) impulse.GenerateImpulse(0.2f);
+                        if (shake)
+                        {
+                            impulse.GenerateImpulse(0.2f);
+                            GameHandler.instance.SmallRumble();
+                        }
                         f.GetComponent<ColorExplosion>().charged = false;
                     }
 

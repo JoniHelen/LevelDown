@@ -2,15 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Audio;
 using TMPro;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 public class UI_Manager : MonoBehaviour
 {
     [SerializeField] SO_PlayerData playerData;
     [SerializeField] GameObject HPBar;
     [SerializeField] GameObject ChargesBar;
+    [SerializeField] AudioMixerSnapshot def;
+    [SerializeField] AudioMixerSnapshot critical;
     [SerializeField] TextMeshProUGUI LevelCounter;
     [SerializeField] AudioSource audio;
+    [SerializeField] Volume postProcessing;
     Image[] HPList;
     Image[] ChargesList;
 
@@ -44,11 +50,15 @@ public class UI_Manager : MonoBehaviour
 
         if (playerData.hitPoints == 1)
         {
+            critical.TransitionTo(0.25f);
+            StartCoroutine(SetSaturation(-80));
             blinking = true;
             BlinkCo = StartCoroutine(Blink(HPList[0]));
         }
         else if (playerData.hitPoints != 0 && blinking)
         {
+            def.TransitionTo(0.25f);
+            StartCoroutine(SetSaturation(0));
             blinking = false;
             StopCoroutine(BlinkCo);
             HPList[0].enabled = true;
@@ -59,6 +69,24 @@ public class UI_Manager : MonoBehaviour
             StopCoroutine(BlinkCo);
             HPList[0].enabled = false;
         }
+    }
+
+    IEnumerator SetSaturation(int value)
+    {
+        float time = 1f;
+        postProcessing.profile.TryGet(out ColorAdjustments effect);
+       
+        while (time > 0)
+        {
+            if (value < 0) effect.saturation.Interp(0, value, time);
+            else effect.saturation.Interp(-80, value, time);
+
+            time -= Time.deltaTime * 4;
+
+            yield return new WaitForEndOfFrame();
+        }
+        
+        effect.saturation.value = value;
     }
 
     public void UpdateCharges()
