@@ -25,6 +25,8 @@ public class GameHandler : MonoBehaviour
 
     float time = 0;
 
+    bool gameEnded = false;
+
     public GameObject currentLevel;
 
     public static GameHandler instance;
@@ -83,12 +85,14 @@ public class GameHandler : MonoBehaviour
 
     public void LargeRumble()
     {
-        StartCoroutine(RumbleForSeconds(0.15f, true));
+        if (player.GetComponent<PlayerInput>().currentControlScheme == "Gamepad")
+            StartCoroutine(RumbleForSeconds(0.15f, true));
     }
 
     public void SmallRumble()
     {
-        StartCoroutine(RumbleForSeconds(0.15f, false));
+        if (player.GetComponent<PlayerInput>().currentControlScheme == "Gamepad")
+            StartCoroutine(RumbleForSeconds(0.15f, false));
     }
 
     IEnumerator RumbleForSeconds(float time, bool intense)
@@ -150,8 +154,11 @@ public class GameHandler : MonoBehaviour
 
     public void EndGame()
     {
-        player.GetComponent<PlayerInput>().DeactivateInput();
-        StartCoroutine(GameOver());
+        if (!gameEnded) {
+            gameEnded = true;
+            player.GetComponent<PlayerInput>().DeactivateInput();
+            StartCoroutine(GameOver());
+        }
     }
 
     public void SetGlitchAmount(float amount)
