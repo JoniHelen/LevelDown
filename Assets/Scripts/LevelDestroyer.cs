@@ -6,7 +6,7 @@ public class LevelDestroyer : MonoBehaviour
 {
     SphereCollider col;
     [SerializeField] float speed;
-    [SerializeField] AudioSource audio;
+    [SerializeField] new AudioSource audio;
 
     private void Awake()
     {

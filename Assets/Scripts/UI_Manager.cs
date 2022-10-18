@@ -15,7 +15,7 @@ public class UI_Manager : MonoBehaviour
     [SerializeField] AudioMixerSnapshot def;
     [SerializeField] AudioMixerSnapshot critical;
     [SerializeField] TextMeshProUGUI LevelCounter;
-    [SerializeField] AudioSource audio;
+    [SerializeField] new AudioSource audio;
     [SerializeField] Volume postProcessing;
     Image[] HPList;
     Image[] ChargesList;
@@ -28,6 +28,12 @@ public class UI_Manager : MonoBehaviour
     {
         HPList = HPBar.GetComponentsInChildren<Image>();
         ChargesList = ChargesBar.GetComponentsInChildren<Image>();
+    }
+
+    public void ResetEffects()
+    {
+        def.TransitionTo(0f);
+        StartCoroutine(SetSaturation(0));
     }
 
     public void UpdateHP()

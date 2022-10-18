@@ -84,6 +84,13 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    public void HealToFull()
+    {
+        playerPosition.Heal(10);
+        GameHandler.instance.SetGlitchAmount((-1f / 72f) * (playerPosition.hitPoints / 10f) + (59f / 3600f));
+        GameHandler.instance.uiManager.UpdateHP();
+    }
+
     public void OnHeal()
     {
         playerPosition.Heal(1);

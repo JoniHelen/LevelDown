@@ -7,7 +7,7 @@ public class ColorExplosion : MonoBehaviour
     SphereCollider col;
     public bool charged;
     [SerializeField] float speed;
-    [SerializeField] AudioSource audio;
+    [SerializeField] new AudioSource audio;
     bool soundPlayed = false;
 
     // Start is called before the first frame update

@@ -16,6 +16,7 @@ public class GameHandler : MonoBehaviour
     public new AudioSource audio;
     [SerializeField] AudioSource ChargeBlip;
     [SerializeField] GameObject endScreen;
+    [SerializeField] GameObject endScreenTip;
 
     [SerializeField] Volume blurVolume;
 
@@ -26,6 +27,8 @@ public class GameHandler : MonoBehaviour
     [SerializeField] float offsetY;
 
     float time = 0;
+
+    PlayerInput input;
 
     bool gameEnded = false;
 
@@ -47,15 +50,10 @@ public class GameHandler : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        input = player.GetComponent<PlayerInput>();
         Cursor.lockState = CursorLockMode.Confined;
-        AudioHandler.instance.PlaySound("Start_Noise", audio);
-        playerData.SetHitPoints(10);
-        SetGlitchAmount(0.0025f);
         GenerateWalls();
-        levelCreated = true;
-        player.GetComponent<PlayerMovement>().enabled = false;
-        gun.GetComponent<GunBehaviour>().canShoot = false;
-        NewLevel();
+        StartGame();
     }
 
     private void Awake()
@@ -85,15 +83,26 @@ public class GameHandler : MonoBehaviour
         }
     }
 
+    public void StartGame()
+    {
+        AudioHandler.instance.PlaySound("Start_Noise", audio);
+        player.GetComponent<PlayerMovement>().HealToFull();
+        SetGlitchAmount(0.0025f);
+        levelCreated = true;
+        player.GetComponent<PlayerMovement>().enabled = false;
+        gun.GetComponent<GunBehaviour>().canShoot = false;
+        NewLevel();
+    }
+
     public void LargeRumble()
     {
-        if (player.GetComponent<PlayerInput>().currentControlScheme == "Gamepad")
+        if (input.currentControlScheme == "Gamepad")
             StartCoroutine(RumbleForSeconds(0.15f, true));
     }
 
     public void SmallRumble()
     {
-        if (player.GetComponent<PlayerInput>().currentControlScheme == "Gamepad")
+        if (input.currentControlScheme == "Gamepad")
             StartCoroutine(RumbleForSeconds(0.15f, false));
     }
 
@@ -152,15 +161,36 @@ public class GameHandler : MonoBehaviour
         Time.timeScale = 0;
         audio.Pause();
         endScreen.SetActive(true);
+        endScreenTip.SetActive(true);
+        input.SwitchCurrentActionMap("Game Over");
     }
 
     public void EndGame()
     {
         if (!gameEnded) {
             gameEnded = true;
-            player.GetComponent<PlayerInput>().DeactivateInput();
+            input.currentActionMap.Disable();
             StartCoroutine(GameOver());
         }
+    }
+
+    public void ResetScene()
+    {
+        input.SwitchCurrentActionMap("Player");
+        uiManager.ResetEffects();
+        player.transform.position = new Vector3(0, 1.5f, 0);
+        playerData.SetPosition(player.transform.position);
+        if (currentLevel != null) Destroy(currentLevel);
+        levelNumber = 0;
+        themePlaying = false;
+        gameEnded = false;
+        endScreen.SetActive(false);
+        endScreenTip.SetActive(false);
+        Enemies.Clear();
+        player.GetComponent<Renderer>().enabled = true;
+        player.transform.GetChild(0).gameObject.SetActive(true);
+        Time.timeScale = 1;
+        StartGame();
     }
 
     public void SetGlitchAmount(float amount)
@@ -274,7 +304,7 @@ public class GameHandler : MonoBehaviour
         {
             Paused = true;
             blurVolume.weight = 1;
-            player.GetComponent<PlayerInput>().DeactivateInput();
+            input.SwitchCurrentActionMap("Paused");
             audio.Pause();
             Time.timeScale = 0;
         }
@@ -282,7 +312,7 @@ public class GameHandler : MonoBehaviour
         {
             Paused = false;
             blurVolume.weight = 0;
-            player.GetComponent<PlayerInput>().ActivateInput();
+            input.SwitchCurrentActionMap("Player");
             if (audio.time > 0)
             {
                 audio.Play();
@@ -299,7 +329,7 @@ public class GameHandler : MonoBehaviour
             {
                 Paused = true;
                 blurVolume.weight = 1;
-                player.GetComponent<PlayerInput>().DeactivateInput();
+                input.SwitchCurrentActionMap("Paused");
                 audio.Pause();
                 Time.timeScale = 0;
             }
@@ -307,7 +337,7 @@ public class GameHandler : MonoBehaviour
             {
                 Paused = false;
                 blurVolume.weight = 0;
-                player.GetComponent<PlayerInput>().ActivateInput();
+                input.SwitchCurrentActionMap("Player");
                 if (audio.time > 0)
                 {
                     audio.Play();

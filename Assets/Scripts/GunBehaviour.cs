@@ -13,7 +13,7 @@ public class GunBehaviour : MonoBehaviour
     [SerializeField] SO_PlayerData playerData;
     [SerializeField] float turnSpeed;
     [SerializeField] LayerMask rayMask;
-    [SerializeField] AudioSource audio;
+    [SerializeField] new AudioSource audio;
 
     float charge = 0;
     bool charging = false;

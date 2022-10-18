@@ -11,7 +11,7 @@ public class EnemyMovement : MonoBehaviour
     [SerializeField] SO_PlayerData playerData;
     [SerializeField] GameObject enemyDeath;
     [SerializeField] GameObject[] pickups;
-    [SerializeField] AudioSource audio;
+    [SerializeField] new AudioSource audio;
 
     bool inRange = false;
 
