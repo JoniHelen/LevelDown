@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.DualShock;
+using UnityEngine.Rendering;
 
 public class GameHandler : MonoBehaviour
 {
@@ -13,9 +13,11 @@ public class GameHandler : MonoBehaviour
     [SerializeField] GameObject transition;
     [SerializeField] Material screenGlitch;
     [SerializeField] SO_PlayerData playerData;
-    public AudioSource audio;
+    public new AudioSource audio;
     [SerializeField] AudioSource ChargeBlip;
     [SerializeField] GameObject endScreen;
+
+    [SerializeField] Volume blurVolume;
 
     [SerializeField] int width;
     [SerializeField] int height;
@@ -271,14 +273,16 @@ public class GameHandler : MonoBehaviour
         if (!Paused)
         {
             Paused = true;
+            blurVolume.weight = 1;
             player.GetComponent<PlayerInput>().DeactivateInput();
             audio.Pause();
             Time.timeScale = 0;
         }
         else
         {
-            player.GetComponent<PlayerInput>().ActivateInput();
             Paused = false;
+            blurVolume.weight = 0;
+            player.GetComponent<PlayerInput>().ActivateInput();
             if (audio.time > 0)
             {
                 audio.Play();
@@ -294,14 +298,16 @@ public class GameHandler : MonoBehaviour
             if (!Paused)
             {
                 Paused = true;
+                blurVolume.weight = 1;
                 player.GetComponent<PlayerInput>().DeactivateInput();
                 audio.Pause();
                 Time.timeScale = 0;
             }
             else
             {
-                player.GetComponent<PlayerInput>().ActivateInput();
                 Paused = false;
+                blurVolume.weight = 0;
+                player.GetComponent<PlayerInput>().ActivateInput();
                 if (audio.time > 0)
                 {
                     audio.Play();
@@ -313,12 +319,12 @@ public class GameHandler : MonoBehaviour
 
     private void OnApplicationFocus(bool focus)
     {
-        if (!focus && !Paused)
+        if (!focus && !Paused && !gameEnded)
         {
             audio.Pause();
             Time.timeScale = 0;
         }
-        else if (!Paused)
+        else if (!Paused && !gameEnded)
         {
             if (audio.time > 0)
             {

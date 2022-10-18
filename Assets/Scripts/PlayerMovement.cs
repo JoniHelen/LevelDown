@@ -10,7 +10,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] SO_PlayerData playerPosition;
     [SerializeField] GameObject death;
     [SerializeField] float speed;
-    [SerializeField] AudioSource audio;
+    [SerializeField] new AudioSource audio;
     Vector3 dir = Vector3.zero;
 
     MaterialPropertyBlock block;
@@ -123,10 +123,10 @@ public class PlayerMovement : MonoBehaviour
         switch (pickup.Type)
         {
             case Pickup.PickupType.Multishot:
-                powerupMask ^= PowerupMask.Multishot;
+                powerupMask &= ~PowerupMask.Multishot;
                 break;
             case Pickup.PickupType.DamageBoost:
-                powerupMask ^= PowerupMask.DamageBoost;
+                powerupMask &= ~PowerupMask.DamageBoost;
                 break;
         }
     }
