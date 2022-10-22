@@ -178,6 +178,15 @@ public class GameHandler : MonoBehaviour
     {
         input.SwitchCurrentActionMap("Player");
         uiManager.ResetEffects();
+
+        GameObject[] pickups = GameObject.FindGameObjectsWithTag("Pickup");
+        GameObject[] enemyProjectiles = GameObject.FindGameObjectsWithTag("EnemyProj");
+        GameObject[] playerProjectiles = GameObject.FindGameObjectsWithTag("PlayerProj");
+
+        foreach (GameObject pickup in pickups) Destroy(pickup);
+        foreach (GameObject enemyProjectile in enemyProjectiles) Destroy(enemyProjectile);
+        foreach (GameObject playerProjectile in playerProjectiles) Destroy(playerProjectile);
+
         player.transform.position = new Vector3(0, 1.5f, 0);
         playerData.SetPosition(player.transform.position);
         if (currentLevel != null) Destroy(currentLevel);
@@ -237,7 +246,9 @@ public class GameHandler : MonoBehaviour
     {
         foreach (GameObject enemy in Enemies)
         {
+            enemy.GetComponent<NavMeshAgent>().enabled = true;
             enemy.GetComponent<EnemyMovement>().enabled = true;
+            enemy.GetComponent<EnemyMovement>().Awake();
         }
     }
 

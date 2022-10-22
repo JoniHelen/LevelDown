@@ -178,11 +178,11 @@ public class GenerateLevel : MonoBehaviour
                             }
                         }
                     }
-                            GameHandler.instance.Enemies.Add(obj);
-                    obj.GetComponent<EnemyMovement>().Awake();
+
+                    GameHandler.instance.Enemies.Add(obj);
                     obj.GetComponent<EnemyMovement>().hitPoints += Mathf.FloorToInt(0.1f * GameHandler.instance.levelNumber);
-                    obj.GetComponent<EnemyMovement>().enabled = false;
                     success++;
+
                     EnemyPos[pos] = true;
                 }
             }
