@@ -30,7 +30,6 @@ public class GunBehaviour : MonoBehaviour
 
     List<Projectile> projectiles = new List<Projectile>();
 
-    // Update is called once per frame
     void Update()
     {
         transform.GetChild(0).localScale = Vector3.one * ((4 * charge + 3) / 10);
@@ -38,33 +37,7 @@ public class GunBehaviour : MonoBehaviour
         if (charge < chargeNeeded && charging)
         {
             charge += Time.deltaTime;
-        }
-
-        if (charge >= chargeNeeded * (1f / 3f))
-        {
-            if (chargeState == 0)
-            {
-                AudioHandler.instance.PlaySound("Charge_Shot", audio, 0.6f);
-                chargeState = 1;
-            }
-        }
-
-        if (charge >= chargeNeeded * (2f / 3f))
-        {
-            if (chargeState == 1)
-            {
-                AudioHandler.instance.PlaySound("Charge_Shot", audio, 0.8f);
-                chargeState = 2;
-            }
-        }
-
-        if (charge >= chargeNeeded)
-        {
-            if (chargeState == 2)
-            {
-                AudioHandler.instance.PlaySound("Charge_Shot", audio);
-                chargeState = 3;
-            }
+            CheckChargeState();
         }
 
         if (shooting && canShoot)
@@ -77,14 +50,24 @@ public class GunBehaviour : MonoBehaviour
                 fireTimer = 0;
             }
         }
+    }
 
-        if (charge == 0)
+    void CheckChargeState()
+    {
+        if (charge >= chargeNeeded * (1f / 3f) && chargeState == 0)
         {
-            chargeState = 0;
+            AudioHandler.instance.PlaySound("Charge_Shot", audio, 0.6f);
+            chargeState++;
         }
-
-        if (charge >= chargeNeeded && ChargeEffect.isPlaying)
+        else if (charge >= chargeNeeded * (2f / 3f) && chargeState == 1)
         {
+            AudioHandler.instance.PlaySound("Charge_Shot", audio, 0.8f);
+            chargeState++;
+        }
+        else if (charge >= chargeNeeded && chargeState == 2)
+        {
+            AudioHandler.instance.PlaySound("Charge_Shot", audio);
+            chargeState++;
             ChargeEffect.Stop();
         }
     }
@@ -170,12 +153,13 @@ public class GunBehaviour : MonoBehaviour
         if (ctx.started && playerData.charges > 0 && canShoot && !shooting)
         {
             charging = true;
-            ChargeEffect.Play();
+            if (chargeState != 3) ChargeEffect.Play();
         }
         
         if (ctx.canceled && playerData.charges > 0)
         {
             charging = false;
+            chargeState = 0;
             ChargeEffect.Stop();
             AttemptShoot();
         }

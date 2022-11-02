@@ -10,6 +10,8 @@ public class GroundBehaviour : MonoBehaviour
     [SerializeField] float amount;
     [SerializeField] float floor;
 
+    Color RandomColor { get => new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f)); }
+
     MaterialPropertyBlock block;
     private void Start()
     {
@@ -28,11 +30,7 @@ public class GroundBehaviour : MonoBehaviour
         rb.isKinematic = false;
 
         Color original = rend.material.GetColor("Emission_Color");
-
-        Vector3 flash = new Vector3(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f)).normalized;
-
-        Color flashColor = new Color(flash.x, flash.y, flash.z);
-
+        Color flashColor = RandomColor;
         Color Current;
 
         float t = 0;
@@ -43,33 +41,22 @@ public class GroundBehaviour : MonoBehaviour
             block.SetFloat("Emission_Strength", (1 - t) * intensity);
             block.SetColor("Emission_Color", Current);
             rend.SetPropertyBlock(block);
-
-            t += Time.deltaTime;
             transform.localScale = Vector3.Lerp(Vector3.one, Vector3.zero, t);
+            t += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
         Destroy(gameObject);
     }
 
-    public void FlashColor()
-    {
-        Vector3 flash = new Vector3(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f)).normalized;
+    public void FlashColor() => StartCoroutine(Flash(RandomColor));
 
-        Color flashColor = new Color(flash.x, flash.y, flash.z);
-        StartCoroutine(Flash(flashColor));
-    }
-
-    public void FlashColor(Color col)
-    {
-        StartCoroutine(Flash(col));
-    }
+    public void FlashColor(Color col) => StartCoroutine(Flash(col));
 
     IEnumerator Flash(Color flashColor)
     {
         float change = amount;
 
         Color original = rend.material.GetColor("Emission_Color");
-
         Color Current;
 
         while (change >= amount - floor)

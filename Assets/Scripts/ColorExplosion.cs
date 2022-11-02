@@ -27,14 +27,8 @@ public class ColorExplosion : MonoBehaviour
                 soundPlayed = true;
             }
 
-            if (col.radius <= 5)
-            {
-                col.radius += Time.deltaTime * speed;
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+            if (col.radius <= 5) col.radius += Time.deltaTime * speed;
+            else Destroy(gameObject);
         }
         else
         {
@@ -44,22 +38,14 @@ public class ColorExplosion : MonoBehaviour
                 soundPlayed = true;
             }
 
-            if (col.radius <= 1.5)
-            {
-                col.radius += Time.deltaTime * speed;
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+            if (col.radius <= 1.5) col.radius += Time.deltaTime * speed;
+            else Destroy(gameObject);
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Level"))
-        {
             other.gameObject.GetComponent<GroundBehaviour>().FlashColor();
-        }
     }
 }
