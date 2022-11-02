@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UniRx;
 
 public class GroundBehaviour : MonoBehaviour
 {
@@ -21,7 +22,7 @@ public class GroundBehaviour : MonoBehaviour
     }
     public void StartDestruction()
     {
-        StartCoroutine(Destruction());
+        MainThreadDispatcher.StartEndOfFrameMicroCoroutine(Destruction());
     }
 
     IEnumerator Destruction()
@@ -43,14 +44,14 @@ public class GroundBehaviour : MonoBehaviour
             rend.SetPropertyBlock(block);
             transform.localScale = Vector3.Lerp(Vector3.one, Vector3.zero, t);
             t += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         Destroy(gameObject);
     }
 
-    public void FlashColor() => StartCoroutine(Flash(RandomColor));
+    public void FlashColor() => MainThreadDispatcher.StartEndOfFrameMicroCoroutine(Flash(RandomColor));
 
-    public void FlashColor(Color col) => StartCoroutine(Flash(col));
+    public void FlashColor(Color col) => MainThreadDispatcher.StartEndOfFrameMicroCoroutine(Flash(col));
 
     IEnumerator Flash(Color flashColor)
     {
@@ -67,7 +68,7 @@ public class GroundBehaviour : MonoBehaviour
             block.SetColor("Emission_Color", Current);
             rend.SetPropertyBlock(block);
             change -= Time.deltaTime * 7 * floor;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         block.SetFloat("Emission_Strength", amount - floor);

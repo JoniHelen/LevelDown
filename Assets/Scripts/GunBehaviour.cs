@@ -5,8 +5,7 @@ using UnityEngine.InputSystem;
 
 public class GunBehaviour : MonoBehaviour
 {
-    [SerializeField] Camera cam;
-    [SerializeField] GameObject player;
+    [SerializeField] PlayerMovement player;
     [SerializeField] GameObject gun;
     [SerializeField] Projectile projectile;
     [SerializeField] ParticleSystem ChargeEffect;
@@ -15,18 +14,17 @@ public class GunBehaviour : MonoBehaviour
     [SerializeField] LayerMask rayMask;
     [SerializeField] new AudioSource audio;
 
-    float charge = 0;
-    bool charging = false;
     public bool canShoot = true;
-    const float chargeNeeded = 0.5f;
-    Vector3 dir = Vector3.forward;
-    Vector3 newDir;
-
+    bool charging = false;
     bool shooting = false;
+
+    float charge = 0;
+    const float chargeNeeded = 0.5f;
     [SerializeField] float rateOfFire = 0.2f;
     float fireTimer = 0;
 
     byte chargeState = 0;
+    Vector3 dir = Vector3.forward;
 
     List<Projectile> projectiles = new List<Projectile>();
 
@@ -74,34 +72,18 @@ public class GunBehaviour : MonoBehaviour
 
     void Shoot()
     {
-        switch (player.GetComponent<PlayerMovement>().powerupMask)
-        {
-            case (PlayerMovement.PowerupMask)1: // Multishot
-                InitProjectiles(true);
-                break;
-            case (PlayerMovement.PowerupMask)2: // Damage boost
-                InitProjectiles(false);
-                BuffDamage();
-                break;
-            case (PlayerMovement.PowerupMask)3: // Multishot & Damage boost
-                InitProjectiles(true);
-                BuffDamage();
-                break;
-            default:
-                InitProjectiles(false); // No powerup
-                break;
-        }
+        if ((player.powerupMask & PlayerMovement.PowerupMask.Multishot) != 0)
+            InitProjectiles(true);
+        else
+            InitProjectiles(false);
+
+        if ((player.powerupMask & PlayerMovement.PowerupMask.DamageBoost) != 0)
+            BuffDamage();
 
         AudioHandler.instance.PlaySound("Player_Shoot", audio);
     }
 
-    void BuffDamage()
-    {
-        foreach(Projectile p in projectiles)
-        {
-            p.damage = 3;
-        }
-    }
+    void BuffDamage() => projectiles.ForEach(p => p.damage = 3);
 
     void InitProjectiles(bool multi)
     {
@@ -138,13 +120,13 @@ public class GunBehaviour : MonoBehaviour
         if (ctx.started && canShoot && charge == 0)
         {
             shooting = true;
-            Shoot();
+            //Shoot();
         }
 
         if (ctx.canceled)
         {
             shooting = false;
-            fireTimer = 0;
+            //fireTimer = 0;
         }
     }
 
@@ -167,7 +149,7 @@ public class GunBehaviour : MonoBehaviour
 
     public void MouseAim(InputAction.CallbackContext ctx)
     {
-        Ray r = cam.ScreenPointToRay(ctx.ReadValue<Vector2>());
+        Ray r = Camera.main.ScreenPointToRay(ctx.ReadValue<Vector2>());
 
         if (Physics.Raycast(r, out RaycastHit rh, Mathf.Infinity, rayMask, QueryTriggerInteraction.Collide))
         {
@@ -195,7 +177,6 @@ public class GunBehaviour : MonoBehaviour
             Projectile obj = Instantiate(projectile, gun.transform.position, Quaternion.Euler(0, 0, 0));
             AudioHandler.instance.PlaySound("Charged_Shot", audio);
             obj.direction = dir.normalized;
-            obj.rotation = Vector3.zero;
             obj.transform.localScale = transform.GetChild(0).localScale;
             obj.charged = true;
             playerData.RemoveCharges(1);

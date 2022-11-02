@@ -5396,8 +5396,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b26e5a68846e13a4a98cdce56e9ce402, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cam: {fileID: 1658284367}
-  player: {fileID: 1158690715}
+  player: {fileID: 1158690721}
   gun: {fileID: 1340155672}
   projectile: {fileID: 5859752610914448421, guid: 7d24dd65ad772c64d99d4eadb6e3dc68, type: 3}
   ChargeEffect: {fileID: 1001527288}
