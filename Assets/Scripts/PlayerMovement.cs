@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     CharacterController characterController;
-    [SerializeField] SO_PlayerData playerPosition;
+    [SerializeField] SO_GameData playerPosition;
     [SerializeField] GameObject death;
     [SerializeField] float speed;
     [SerializeField] new AudioSource audio;

@@ -2,42 +2,38 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(SphereCollider))]
 public class LevelDestroyer : MonoBehaviour
 {
-    SphereCollider col;
-    [SerializeField] float speed;
-    [SerializeField] new AudioSource audio;
+    SphereCollider Sphere;
+    [SerializeField] float Speed;
+    [SerializeField] AudioSource Audio;
+    [SerializeField] SO_GameData gameData;
 
-    private void Awake()
-    {
-        col = GetComponent<SphereCollider>();
-        AudioHandler.instance.PlaySound("Level_Transition", audio);
-    }
+    private void Awake() => Sphere = GetComponent<SphereCollider>();
 
-    // Update is called once per frame
+    private void OnEnable() => AudioHandler.instance.PlaySound("Level_Transition", Audio);
+
+    private void OnDisable() => Sphere.radius = 0f;
+
     void Update()
     {
-        col.radius += Time.deltaTime * speed;
-        if (col.radius > 19)
+        Sphere.radius += Time.deltaTime * Speed;
+        if (Sphere.radius > 19f)
         {
-            Destroy(transform.parent.gameObject, 2f);
-            Destroy(gameObject);
+            gameObject.SetActive(false);
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Level"))
-        {
-            other.gameObject.GetComponent<GroundBehaviour>().StartDestruction();
-        }
-        else if (other.gameObject.CompareTag("Pickup"))
-        {
-            other.gameObject.GetComponent<Pickup>().OnLevelDown();
-        }
-        else if (other.gameObject.CompareTag("EnemyProj"))
-        {
-            Destroy(other.gameObject);
-        }
+        if (other.TryGetComponent(out GroundBehaviour gb))
+            gb.StartDestruction();
+
+        if (other.TryGetComponent(out Pickup p))
+            p.OnLevelDown();
+
+        if (other.TryGetComponent(out Projectile pr))
+            Destroy(pr.gameObject);
     }
 }

@@ -58,9 +58,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1173f3274a5c8384eae15b3678fd9595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  charged: 0
-  speed: 25
-  audio: {fileID: -1188396541173041276}
+  Charged: 0
+  Speed: 20
+  Audio: {fileID: -1188396541173041276}
 --- !u!82 &-1188396541173041276
 AudioSource:
   m_ObjectHideFlags: 0

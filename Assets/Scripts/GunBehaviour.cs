@@ -1,18 +1,17 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class GunBehaviour : MonoBehaviour
 {
-    [SerializeField] PlayerMovement player;
     [SerializeField] GameObject gun;
     [SerializeField] Projectile projectile;
+    [SerializeField] PlayerMovement player;
+    [SerializeField] SO_GameData playerData;
     [SerializeField] ParticleSystem ChargeEffect;
-    [SerializeField] SO_PlayerData playerData;
+    [SerializeField] new AudioSource audio;
     [SerializeField] float turnSpeed;
     [SerializeField] LayerMask rayMask;
-    [SerializeField] new AudioSource audio;
 
     public bool canShoot = true;
     bool charging = false;
@@ -72,10 +71,7 @@ public class GunBehaviour : MonoBehaviour
 
     void Shoot()
     {
-        if ((player.powerupMask & PlayerMovement.PowerupMask.Multishot) != 0)
-            InitProjectiles(true);
-        else
-            InitProjectiles(false);
+        InitProjectiles((player.powerupMask & PlayerMovement.PowerupMask.Multishot) != 0);
 
         if ((player.powerupMask & PlayerMovement.PowerupMask.DamageBoost) != 0)
             BuffDamage();
@@ -83,33 +79,37 @@ public class GunBehaviour : MonoBehaviour
         AudioHandler.instance.PlaySound("Player_Shoot", audio);
     }
 
-    void BuffDamage() => projectiles.ForEach(p => p.damage = 3);
+    void BuffDamage() => projectiles.ForEach(p => p.Damage = 3);
 
     void InitProjectiles(bool multi)
     {
         projectiles.Clear();
 
-        Projectile p1 = Instantiate(projectile, gun.transform.position, Quaternion.Euler(0, 0, 0));
-        p1.direction = dir.normalized;
-        p1.rotation = Vector3.zero;
+        Projectile p1 = playerData.ProjectilePool.Get();
+        p1.Initialize()
 
         if (multi)
         {
-            p1.shake = true;
+            p1.Initialize(dir);
+            p1.Shake = true;
 
             Projectile p2 = Instantiate(projectile, gun.transform.position, Quaternion.Euler(0, 0, 0));
-            p2.direction = Quaternion.AngleAxis(17.5f, Vector3.up) * dir.normalized;
-            p2.rotation = Vector3.zero;
-            p2.shake = true;
+            p2.Direction = Quaternion.AngleAxis(17.5f, Vector3.up) * dir.normalized;
+            p2.Rotation = Vector3.zero;
+            p2.Shake = true;
 
             projectiles.Add(p2);
 
             Projectile p3 = Instantiate(projectile, gun.transform.position, Quaternion.Euler(0, 0, 0));
-            p3.direction = Quaternion.AngleAxis(-17.5f, Vector3.up) * dir.normalized;
-            p3.rotation = Vector3.zero;
-            p3.shake = true;
+            p3.Direction = Quaternion.AngleAxis(-17.5f, Vector3.up) * dir.normalized;
+            p3.Rotation = Vector3.zero;
+            p3.Shake = true;
 
             projectiles.Add(p3);
+        }
+        else
+        {
+
         }
 
         projectiles.Add(p1);
@@ -153,7 +153,7 @@ public class GunBehaviour : MonoBehaviour
 
         if (Physics.Raycast(r, out RaycastHit rh, Mathf.Infinity, rayMask, QueryTriggerInteraction.Collide))
         {
-            dir = rh.point - player.transform.position;
+            dir = (rh.point - player.transform.position).normalized;
             dir.y = 0;
 
             transform.rotation = Quaternion.LookRotation(dir);
@@ -176,9 +176,9 @@ public class GunBehaviour : MonoBehaviour
         {
             Projectile obj = Instantiate(projectile, gun.transform.position, Quaternion.Euler(0, 0, 0));
             AudioHandler.instance.PlaySound("Charged_Shot", audio);
-            obj.direction = dir.normalized;
+            obj.Direction = dir;
             obj.transform.localScale = transform.GetChild(0).localScale;
-            obj.charged = true;
+            obj.Charged = true;
             playerData.RemoveCharges(1);
             GameHandler.instance.uiManager.UpdateCharges();
         }

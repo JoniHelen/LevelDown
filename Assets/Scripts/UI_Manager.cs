@@ -9,7 +9,7 @@ using UnityEngine.Rendering.Universal;
 
 public class UI_Manager : MonoBehaviour
 {
-    [SerializeField] SO_PlayerData playerData;
+    [SerializeField] SO_GameData playerData;
     [SerializeField] GameObject HPBar;
     [SerializeField] GameObject ChargesBar;
     [SerializeField] AudioMixerSnapshot def;

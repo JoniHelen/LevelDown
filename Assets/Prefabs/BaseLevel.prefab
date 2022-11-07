@@ -47,7 +47,7 @@ MonoBehaviour:
   small: {fileID: 7766773545928228456, guid: b2522a8776161e341906787f2787d579, type: 3}
   large: {fileID: 1261440628440578142, guid: dd04e29ef54f8d146848fc14cc9e4c11, type: 3}
   enemy: {fileID: 4468921793534156965, guid: cc6da46513bce2548befe60f83a96d35, type: 3}
-  playerPos: {fileID: 11400000, guid: fbca57ef320c6b14287f8ef8b2690eaf, type: 2}
+  gameData: {fileID: 11400000, guid: 36679825108461f4cb6af795395c6fa8, type: 2}
   levelSurface: {fileID: -8913611887931866009}
   easyPool: {fileID: 11400000, guid: 300cacf14a01ba44295d7f3ab3ade970, type: 2}
   hardPool: {fileID: 11400000, guid: 61d14f501d56d974caf70cb8c9828ccd, type: 2}

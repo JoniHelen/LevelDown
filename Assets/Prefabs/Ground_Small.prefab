@@ -109,9 +109,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5f9833975ccbf041b50331abd4ae36a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  intensity: 15
-  amount: 4
-  floor: 2
+  groundSettings: {fileID: 11400000, guid: 31c3aea7a81b836488d4c995f3eb856d, type: 2}
+  gameData: {fileID: 11400000, guid: 36679825108461f4cb6af795395c6fa8, type: 2}
 --- !u!54 &-4337284509853381154
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -10,9 +10,9 @@ public class GameHandler : MonoBehaviour
 {
     [SerializeField] GameObject level;
     [SerializeField] GameObject wall;
-    [SerializeField] GameObject transition;
+    [SerializeField] LevelDestroyer transition;
     [SerializeField] Material screenGlitch;
-    [SerializeField] SO_PlayerData playerData;
+    [SerializeField] SO_GameData playerData;
     public new AudioSource audio;
     [SerializeField] AudioSource ChargeBlip;
     [SerializeField] GameObject endScreen;
@@ -283,7 +283,7 @@ public class GameHandler : MonoBehaviour
         if (levelCreated)
         {
             currentLevel.GetComponent<NavMeshSurface>().RemoveData();
-            Instantiate(transition, Vector3.zero, Quaternion.Euler(0, 0, 0), currentLevel.transform);
+            transition.gameObject.SetActive(true);
         }
     }
 

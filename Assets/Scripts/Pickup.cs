@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(SphereCollider))]
 public class Pickup : MonoBehaviour
 {
     public enum PickupType { HP, Multishot, DamageBoost }
@@ -22,11 +23,13 @@ public class Pickup : MonoBehaviour
             }
             else
             {
-                other.gameObject.GetComponent<PlayerMovement>().OnPickupPowerup(new PickupData(Duration, type));
+                other.gameObject.GetComponent<PlayerMovement>().OnPickupPowerup(this);
                 Destroy(gameObject);
             }
         }
     }
+
+    public static implicit operator PickupData(Pickup p) => new PickupData(p.Duration, p.type);
 
     public void OnLevelDown()
     {

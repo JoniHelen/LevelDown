@@ -3,31 +3,44 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 using UnityEngine.AI;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.DualShock;
-public class Projectile : MonoBehaviour
-{
-    public Vector3 direction = Vector3.zero;
-    public Vector3 rotation = Vector3.zero;
-    public float speed;
-    public bool charged;
-    public bool shake;
-    public int damage = 1;
 
+
+public class Projectile : MonoBehaviour // POOLED
+{
+    Vector3 Direction = Vector3.zero;
+    Vector3 Rotation = Vector3.zero;
+    bool Charged;
+    bool Shake;
+    int BaseDamage = 1;
+    int Damage = 1;
+
+    public float Speed;
     [SerializeField] GameObject playerExplosion;
     [SerializeField] GameObject enemyExplosion;
     [SerializeField] GameObject small;
     [SerializeField] GameObject flash;
     [SerializeField] CinemachineImpulseSource impulse;
-    [SerializeField] SO_PlayerData playerData;
+    [SerializeField] SO_GameData playerData;
 
     bool damageDealt = false;
 
     void Update()
     {
-        transform.Translate(direction.normalized * Time.deltaTime * speed, Space.World);
-        transform.Rotate(rotation * Time.deltaTime, Space.Self);
+        transform.Translate(Speed * Time.deltaTime * Direction.normalized, Space.World);
+        transform.Rotate(Rotation * Time.deltaTime, Space.Self);
     }
+
+    public void Initialize(Vector3 pos = default, Vector3 dir = default, Vector3 rot = default, int dmg = 1, bool charged = false, bool shake = false)
+    {
+        transform.position = pos;
+        Direction = dir;
+        Rotation = rot;
+        Damage = dmg;
+        Charged = charged;
+        Shake = shake;
+    }
+
+    // TODO: IMPLEMENT AUDIO ON HIT
 
     private void OnTriggerEnter(Collider other)
     {
@@ -75,21 +88,21 @@ public class Projectile : MonoBehaviour
                 GameObject f = Instantiate(flash, transform.position, Quaternion.Euler(0, 0, 0));
 
                 // Determine charged status
-                if (charged)
+                if (Charged)
                 {
-                    f.GetComponent<ColorExplosion>().charged = true;
+                    f.GetComponent<ColorExplosion>().Charged = true;
                     // Enemy takes damage
                     impulse.GenerateImpulse(0.7f);
                     GameHandler.instance.LargeRumble();
-                    other.gameObject.GetComponent<EnemyMovement>().TakeDamage(damage + 3, direction, charged);
+                    other.gameObject.GetComponent<EnemyMovement>().TakeDamage(Damage + 3, Direction, Charged);
                 }
                 else
                 {
-                    f.GetComponent<ColorExplosion>().charged = false;
+                    f.GetComponent<ColorExplosion>().Charged = false;
                     // Enemy takes damage
                     /*if (shake)*/ impulse.GenerateImpulse(0.2f);
                     GameHandler.instance.SmallRumble();
-                    other.gameObject.GetComponent<EnemyMovement>().TakeDamage(damage, direction, charged);
+                    other.gameObject.GetComponent<EnemyMovement>().TakeDamage(Damage, Direction, Charged);
                 }
 
                 // Spawn player particles and destroy them with self
@@ -101,7 +114,7 @@ public class Projectile : MonoBehaviour
             else if (other.gameObject.CompareTag("Level") || other.gameObject.CompareTag("Wall")) // If projectile hits level
             {
                 // if the projectile didn't hit a wall and was charged
-                if (other.gameObject.CompareTag("Level") && charged)
+                if (other.gameObject.CompareTag("Level") && Charged)
                 {
                     impulse.GenerateImpulse(0.7f);
                     GameHandler.instance.LargeRumble();
@@ -114,7 +127,7 @@ public class Projectile : MonoBehaviour
                     // Spawn particles and flash
                     GameObject obj = Instantiate(playerExplosion, transform.position, Quaternion.Euler(0, 0, 0));
                     GameObject f = Instantiate(flash, transform.position, Quaternion.Euler(0, 0, 0));
-                    f.GetComponent<ColorExplosion>().charged = true;
+                    f.GetComponent<ColorExplosion>().Charged = true;
 
                     // Rebuild NavMesh for enemies
                     GameHandler.instance.currentLevel.GetComponent<NavMeshSurface>().RemoveData();
@@ -131,20 +144,20 @@ public class Projectile : MonoBehaviour
                     GameObject f = Instantiate(flash, transform.position, Quaternion.Euler(0, 0, 0));
 
                     // Determine charged state
-                    if (charged)
+                    if (Charged)
                     {
                         impulse.GenerateImpulse(0.7f);
                         GameHandler.instance.LargeRumble();
-                        f.GetComponent<ColorExplosion>().charged = true;
+                        f.GetComponent<ColorExplosion>().Charged = true;
                     }
                     else
                     {
-                        if (shake)
+                        if (Shake)
                         {
                             impulse.GenerateImpulse(0.2f);
                             GameHandler.instance.SmallRumble();
                         }
-                        f.GetComponent<ColorExplosion>().charged = false;
+                        f.GetComponent<ColorExplosion>().Charged = false;
                     }
 
                     // Destroy particles and self

@@ -8,7 +8,7 @@ public class GenerateLevel : MonoBehaviour
     [SerializeField] GameObject small;
     [SerializeField] GameObject large;
     [SerializeField] GameObject enemy;
-    [SerializeField] SO_PlayerData playerPos;
+    [SerializeField] SO_GameData gameData;
     [SerializeField] NavMeshSurface levelSurface;
 
     [SerializeField] SO_LevelPool easyPool;
@@ -28,6 +28,12 @@ public class GenerateLevel : MonoBehaviour
     Dictionary<Vector2Int, bool> EnemyPos = new Dictionary<Vector2Int, bool>();
     Vector3 startPos;
 
+    Color RandomColor { get {
+            Vector3 v = new Vector3(Random.value, Random.value, Random.value).normalized;
+            return new Color(v.x, v.y, v.z);
+        }
+    }
+
     void Start()
     {
         startPos = transform.position;
@@ -36,13 +42,11 @@ public class GenerateLevel : MonoBehaviour
 
     void GenerateFloor()
     {
-        float rnd = Random.value * 100;
+        float rnd = Random.Range(0f, 100f);
 
         Vector2Int pOffset = PlayerOffset(rnd);
 
-        Vector3 temp = new Vector3(Random.value, Random.value, Random.value).normalized;
-
-        Color rndColor = new Color(temp.x, temp.y, temp.z);
+        Color rndColor = RandomColor;
 
         for (int x = 1; x < width - 1; x++)
         {
@@ -53,17 +57,16 @@ public class GenerateLevel : MonoBehaviour
 
                 float perlin = Mathf.PerlinNoise(xCoord, yCoord);
 
+                GroundBehaviour l = gameData.GroundPool.Get();
+                l.transform.parent = transform;
+                l.transform.position = transform.position + new Vector3(x + offsetX, 1, y + offsetY);
+
+                l.GroundColor = rndColor;
+
                 if (perlin > Mathf.Clamp(threshold, 0, 1))
-                {
-                    GameObject l = Instantiate(large, transform.position + new Vector3(x + offsetX, 1, y + offsetY), Quaternion.Euler(0, 0, 0), transform);
-                    l.GetComponent<Renderer>().material.SetColor("Emission_Color", rndColor);
-                }
+                    l.Type = GroundBehaviour.GroundType.Tall;
                 else
-                {
-                    GameObject s = Instantiate(small, transform.position + new Vector3(x + offsetX, 0.5f, y + offsetY), Quaternion.Euler(0, 0, 0), transform);
-                    s.GetComponent<Renderer>().material.SetColor("Emission_Color", rndColor);
                     EnemyPos.Add(new Vector2Int(x, y), false);
-                }
             }
         }
 
@@ -91,7 +94,7 @@ public class GenerateLevel : MonoBehaviour
         {
             for (int y = 0; y < 7; y++)
             {
-                Vector2Int key = new Vector2Int(Mathf.FloorToInt(playerPos.position.x - offsetX) + (x - 3), Mathf.FloorToInt(playerPos.position.z - offsetY) + (y - 3));
+                Vector2Int key = new Vector2Int(Mathf.FloorToInt(gameData.position.x - offsetX) + (x - 3), Mathf.FloorToInt(gameData.position.z - offsetY) + (y - 3));
 
                 if (EnemyPos.ContainsKey(key))
                 {
@@ -114,7 +117,7 @@ public class GenerateLevel : MonoBehaviour
             {
                 for (float y = 0; y < 5; y++)
                 {
-                    if (Mathf.PerlinNoise((Mathf.FloorToInt(playerPos.position.x - offsetX) + (x - 2)) / (width - 2) * scale + random + xOffset, (Mathf.FloorToInt(playerPos.position.z - offsetY) + (y - 2)) / (height - 2) * scale + random + yOffset) < Mathf.Clamp(threshold, 0, 1))
+                    if (Mathf.PerlinNoise((Mathf.FloorToInt(gameData.position.x - offsetX) + (x - 2)) / (width - 2) * scale + random + xOffset, (Mathf.FloorToInt(gameData.position.z - offsetY) + (y - 2)) / (height - 2) * scale + random + yOffset) < Mathf.Clamp(threshold, 0, 1))
                     {
                         goodSpot++;
                     }

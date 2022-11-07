@@ -8,7 +8,7 @@ public class EnemyMovement : MonoBehaviour
 {
     Vector3 direction = Vector3.zero;
     [SerializeField] Projectile projectile;
-    [SerializeField] SO_PlayerData playerData;
+    [SerializeField] SO_GameData playerData;
     [SerializeField] GameObject enemyDeath;
     [SerializeField] GameObject[] pickups;
     [SerializeField] new AudioSource audio;
@@ -54,7 +54,7 @@ public class EnemyMovement : MonoBehaviour
     {
         if (inRange)
         {
-            agent.Move(direction * agent.speed * Time.deltaTime);
+            agent.Move(agent.speed * Time.deltaTime * direction);
         }
         else
         {
@@ -86,10 +86,10 @@ public class EnemyMovement : MonoBehaviour
         while (true)
         {
             Projectile obj = Instantiate(projectile, transform.position, Quaternion.Euler(0, 0, 0), transform.parent);
-            obj.direction = (playerData.position - transform.position).normalized;
+            obj.Direction = (playerData.position - transform.position).normalized;
             obj.direction.y = 0;
-            obj.rotation = new Vector3(Random.value * 360, Random.value * 360, Random.value * 360);
-            obj.speed = 7;
+            obj.Rotation = new Vector3(Random.value * 360, Random.value * 360, Random.value * 360);
+            obj.Speed = 7;
 
             AudioHandler.instance.PlaySound("Player_Shoot", audio, 0.7f);
             yield return new WaitForSeconds(1);
@@ -129,7 +129,7 @@ public class EnemyMovement : MonoBehaviour
         while (t > 0)
         {
             agent.isStopped = true;
-            agent.Move(dir * Time.deltaTime * intensity);
+            agent.Move(intensity * Time.deltaTime * dir);
             t -= Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
@@ -183,9 +183,9 @@ public class EnemyMovement : MonoBehaviour
             for (int i = 0; i < 8; i++)
             {
                 Projectile obj = Instantiate(projectile, transform.position, Quaternion.Euler(0, 0, 0), transform.parent);
-                obj.direction = new Vector3(Mathf.Cos(Mathf.Deg2Rad * i * 45 + offset), 0, Mathf.Sin(Mathf.Deg2Rad * i * 45 + offset));
-                obj.rotation = new Vector3(Random.value * 360, Random.value * 360, Random.value * 360);
-                obj.speed = 4;
+                obj.Direction = new Vector3(Mathf.Cos(Mathf.Deg2Rad * i * 45 + offset), 0, Mathf.Sin(Mathf.Deg2Rad * i * 45 + offset));
+                obj.Rotation = new Vector3(Random.value * 360, Random.value * 360, Random.value * 360);
+                obj.Speed = 4;
             }
 
             AudioHandler.instance.PlaySound("Player_Shoot", audio, 0.7f);

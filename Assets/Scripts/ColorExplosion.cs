@@ -2,50 +2,30 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ColorExplosion : MonoBehaviour
+[RequireComponent(typeof(SphereCollider))]
+public class ColorExplosion : MonoBehaviour // POOLED
 {
-    SphereCollider col;
-    public bool charged;
-    [SerializeField] float speed;
-    [SerializeField] new AudioSource audio;
-    bool soundPlayed = false;
+    SphereCollider Sphere;
 
-    // Start is called before the first frame update
-    void Awake()
-    {
-        col = GetComponent<SphereCollider>();
-    }
+    [HideInInspector] public bool Charged;
 
-    // Update is called once per frame
+    [SerializeField] float Speed;
+    [SerializeField] AudioSource Audio;
+    [SerializeField] SO_GameData gameData;
+
+    void Awake() => Sphere = GetComponent<SphereCollider>();
+
     void Update()
     {
-        if (charged)
-        {
-            if (!soundPlayed)
-            {
-                AudioHandler.instance.PlaySound("Explosion", audio);
-                soundPlayed = true;
-            }
+        Sphere.radius += Time.deltaTime * Speed;
 
-            if (col.radius <= 5) col.radius += Time.deltaTime * speed;
-            else Destroy(gameObject);
-        }
-        else
-        {
-            if (!soundPlayed)
-            {
-                AudioHandler.instance.PlaySound("Wall_Hit", audio);
-                soundPlayed = true;
-            }
+        if (Charged && Sphere.radius > 5) gameData.ColorPool.Release(this);
 
-            if (col.radius <= 1.5) col.radius += Time.deltaTime * speed;
-            else Destroy(gameObject);
-        }
+        if (!Charged && Sphere.radius > 1.5) gameData.ColorPool.Release(this);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Level"))
-            other.gameObject.GetComponent<GroundBehaviour>().FlashColor();
+        if (other.TryGetComponent(out GroundBehaviour gb)) gb.FlashColor();
     }
 }

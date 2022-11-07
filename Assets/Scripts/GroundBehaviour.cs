@@ -3,76 +3,142 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 
-public class GroundBehaviour : MonoBehaviour
+[RequireComponent(typeof(Rigidbody))]
+public class GroundBehaviour : MonoBehaviour // POOLED
 {
+    public enum GroundType { Short, Tall }
+
+    GroundType groundType = GroundType.Short;
+
+    float Glow;
+    bool Destroyed = false;
+
     Rigidbody rb;
     Renderer rend;
-    [SerializeField] float intensity;
-    [SerializeField] float amount;
-    [SerializeField] float floor;
-
-    Color RandomColor { get => new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f)); }
-
     MaterialPropertyBlock block;
-    private void Start()
+
+    [SerializeField] SO_GroundSettings groundSettings;
+    [SerializeField] SO_GameData gameData;
+
+    Color currentColor;
+    public Color GroundColor
+    {
+        get 
+        {
+            if (Type == GroundType.Short)
+                return currentColor;
+
+            if (Type == GroundType.Tall)
+                return Color.black;
+
+            return currentColor;
+        }
+        set 
+        {
+            currentColor = value;
+            if (Type == GroundType.Short)
+                SetColorAndStrength(value, Glow);
+
+            if (Type == GroundType.Tall)
+                SetColorAndStrength(Color.black, Glow);
+
+            SetColorAndStrength(value, Glow);
+        }
+    }
+    Color RandomColor { get {
+            Vector3 v = new Vector3(Random.value, Random.value, Random.value).normalized;
+            return new Color(v.x, v.y, v.z);
+        }
+    }
+    public GroundType Type { 
+        get { return groundType; } 
+        set 
+        {
+            switch (value)
+            {
+                case GroundType.Short:
+                    Glow = groundSettings.Glow;
+                    if (groundType == GroundType.Tall)
+                        transform.Translate(Vector3.down * 0.5f);
+                    transform.localScale = Vector3.one;
+                    break;
+
+                case GroundType.Tall:
+                    Glow = 0f;
+                    if (groundType == GroundType.Short)
+                        transform.Translate(Vector3.up * 0.5f);
+                    transform.localScale = new Vector3(1, 2, 1);
+                    break;
+
+                default:
+                    break;
+            }
+            groundType = value;
+            SetColorAndStrength(GroundColor, Glow);
+        }
+    }
+
+    private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         rend = GetComponent<Renderer>();
         block = new MaterialPropertyBlock();
+        Glow = groundSettings.Glow;
     }
-    public void StartDestruction()
+    private void OnDisable()
     {
-        MainThreadDispatcher.StartEndOfFrameMicroCoroutine(Destruction());
+        transform.rotation = Quaternion.identity;
+        rb.useGravity = false;
+        rb.isKinematic = true;
+    }
+    private void OnEnable()
+    {
+        Type = GroundType.Short;
+        Destroyed = false;
     }
 
-    IEnumerator Destruction()
+    void SetColorAndStrength(Color color, float strength)
     {
+        block.SetColor("Emission_Color", color);
+        block.SetFloat("Emission_Strength", strength);
+        rend.SetPropertyBlock(block);
+    }
+
+    public void StartDestruction()
+    {
+        if (!Destroyed) MainThreadDispatcher.StartEndOfFrameMicroCoroutine(Destruction(RandomColor));
+    }
+    IEnumerator Destruction(Color flashColor)
+    {
+        float t = 0;
+        Destroyed = true;
         rb.useGravity = true;
         rb.isKinematic = false;
 
-        Color original = rend.material.GetColor("Emission_Color");
-        Color flashColor = RandomColor;
-        Color Current;
-
-        float t = 0;
         while (t < 1)
         {
-            Current = Color.Lerp(flashColor, original, t);
-
-            block.SetFloat("Emission_Strength", (1 - t) * intensity);
-            block.SetColor("Emission_Color", Current);
-            rend.SetPropertyBlock(block);
+            SetColorAndStrength(Color.Lerp(flashColor, GroundColor, t), (1 - t) * groundSettings.FlashBrightness);
             transform.localScale = Vector3.Lerp(Vector3.one, Vector3.zero, t);
             t += Time.deltaTime;
             yield return null;
         }
-        Destroy(gameObject);
+        SetColorAndStrength(GroundColor, 0);
+        gameData.GroundPool.Release(this);
     }
-
     public void FlashColor() => MainThreadDispatcher.StartEndOfFrameMicroCoroutine(Flash(RandomColor));
-
     public void FlashColor(Color col) => MainThreadDispatcher.StartEndOfFrameMicroCoroutine(Flash(col));
-
     IEnumerator Flash(Color flashColor)
     {
-        float change = amount;
+        float Change = groundSettings.FlashBrightness - Glow;
+        float Duration = groundSettings.FlashDuration;
+        float Elapsed = 0f;
 
-        Color original = rend.material.GetColor("Emission_Color");
-        Color Current;
-
-        while (change >= amount - floor)
+        while (Elapsed < Duration)
         {
-            Current = Color.Lerp(flashColor, original, change - floor);
-
-            block.SetFloat("Emission_Strength", change * intensity);
-            block.SetColor("Emission_Color", Current);
-            rend.SetPropertyBlock(block);
-            change -= Time.deltaTime * 7 * floor;
+            SetColorAndStrength(Color.Lerp(flashColor, GroundColor, Elapsed / Duration), (1 - Elapsed / Duration) * Change);
+            Elapsed += Time.deltaTime;
             yield return null;
         }
-
-        block.SetFloat("Emission_Strength", amount - floor);
-        block.SetColor("Emission_Color", original);
-        rend.SetPropertyBlock(block);
+        SetColorAndStrength(GroundColor, Glow);
     }
 }
