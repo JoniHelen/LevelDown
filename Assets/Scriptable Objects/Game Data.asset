@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: Game Data
   m_EditorClassIdentifier: 
   GroundPrefab: {fileID: 5415706128818253447, guid: b2522a8776161e341906787f2787d579, type: 3}
+  ProjectilePrefab: {fileID: 5859752610914448421, guid: 7d24dd65ad772c64d99d4eadb6e3dc68, type: 3}

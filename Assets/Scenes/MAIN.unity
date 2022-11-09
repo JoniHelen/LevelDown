@@ -2556,7 +2556,7 @@ BoxCollider:
   m_GameObject: {fileID: 1158690715}
   m_Material: {fileID: 13400000, guid: 705b047aa7215614289a002a696a2f9a, type: 2}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -3220,7 +3220,7 @@ GameObject:
   - component: {fileID: 1340155674}
   m_Layer: 0
   m_Name: Gun
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3514,7 +3514,7 @@ MonoBehaviour:
   wall: {fileID: 1261440628440578142, guid: ca1dd3ea90f5bec43a38b20d8caa8547, type: 3}
   transition: {fileID: 1068103908}
   screenGlitch: {fileID: 2100000, guid: 2ab61b20a21608549a80886be8c39e17, type: 2}
-  playerData: {fileID: 11400000, guid: fbca57ef320c6b14287f8ef8b2690eaf, type: 2}
+  playerData: {fileID: 11400000, guid: 36679825108461f4cb6af795395c6fa8, type: 2}
   audio: {fileID: 1457681002}
   ChargeBlip: {fileID: 1457681003}
   endScreen: {fileID: 1944396065}
@@ -5453,7 +5453,7 @@ GameObject:
   - component: {fileID: 2110791893}
   m_Layer: 0
   m_Name: Wrapper
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5485,16 +5485,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b26e5a68846e13a4a98cdce56e9ce402, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 1158690721}
   gun: {fileID: 1340155672}
   projectile: {fileID: 5859752610914448421, guid: 7d24dd65ad772c64d99d4eadb6e3dc68, type: 3}
+  player: {fileID: 1158690721}
+  playerData: {fileID: 11400000, guid: 36679825108461f4cb6af795395c6fa8, type: 2}
   ChargeEffect: {fileID: 1001527288}
-  playerData: {fileID: 11400000, guid: fbca57ef320c6b14287f8ef8b2690eaf, type: 2}
+  audio: {fileID: 2110791893}
   turnSpeed: 100
   rayMask:
     serializedVersion: 2
     m_Bits: 128
-  audio: {fileID: 2110791893}
   canShoot: 1
   rateOfFire: 0.2
 --- !u!82 &2110791893
