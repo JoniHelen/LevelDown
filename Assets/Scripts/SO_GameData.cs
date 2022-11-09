@@ -26,14 +26,14 @@ public class SO_GameData : ScriptableObject
     public ObjectPool<Projectile> ProjectilePool
     { get {
             if (m_ProjectilePool == null)
-                m_ProjectilePool = new ObjectPool<Projectile>(OnCreateColor, OnTakeColor, OnReturnColor);
+                m_ProjectilePool = new ObjectPool<Projectile>(OnCreateProjectile, OnTakeProjectile, OnReturnProjectile);
             return m_ProjectilePool;
         }
     }
     [SerializeField] Projectile ProjectilePrefab;
-    Projectile OnCreateColor() => Instantiate(ProjectilePrefab);
-    void OnReturnColor(Projectile proj) => proj.gameObject.SetActive(false);
-    void OnTakeColor(Projectile proj) => proj.gameObject.SetActive(true);
+    Projectile OnCreateProjectile() => Instantiate(ProjectilePrefab);
+    void OnReturnProjectile(Projectile proj) => proj.gameObject.SetActive(false);
+    void OnTakeProjectile(Projectile proj) { } /*=> proj.gameObject.SetActive(true);*/
 
     public Vector3 position { get; private set; }
     public int hitPoints { get; private set; }

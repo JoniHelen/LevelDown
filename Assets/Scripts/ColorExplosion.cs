@@ -19,9 +19,9 @@ public class ColorExplosion : MonoBehaviour // POOLED
     {
         Sphere.radius += Time.deltaTime * Speed;
 
-        if (Charged && Sphere.radius > 5) gameData.ColorPool.Release(this);
+        //if (Charged && Sphere.radius > 5) gameData.ColorPool.Release(this);
 
-        if (!Charged && Sphere.radius > 1.5) gameData.ColorPool.Release(this);
+        //if (!Charged && Sphere.radius > 1.5) gameData.ColorPool.Release(this);
     }
 
     private void OnTriggerEnter(Collider other)

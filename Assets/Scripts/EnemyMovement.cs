@@ -85,11 +85,11 @@ public class EnemyMovement : MonoBehaviour
         yield return new WaitForSeconds(Random.value * 0.3f);
         while (true)
         {
-            Projectile obj = Instantiate(projectile, transform.position, Quaternion.Euler(0, 0, 0), transform.parent);
-            obj.Direction = (playerData.position - transform.position).normalized;
-            obj.direction.y = 0;
-            obj.Rotation = new Vector3(Random.value * 360, Random.value * 360, Random.value * 360);
-            obj.Speed = 7;
+            Vector3 dir = (playerData.position - transform.position).normalized;
+            dir.y = 0;
+            playerData.ProjectilePool.Get()
+                .Initialize(Projectile.ProjectileType.enemy, transform.position, dir, rot: new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f)))
+                .transform.parent = transform.parent;
 
             AudioHandler.instance.PlaySound("Player_Shoot", audio, 0.7f);
             yield return new WaitForSeconds(1);
@@ -182,10 +182,10 @@ public class EnemyMovement : MonoBehaviour
 
             for (int i = 0; i < 8; i++)
             {
-                Projectile obj = Instantiate(projectile, transform.position, Quaternion.Euler(0, 0, 0), transform.parent);
-                obj.Direction = new Vector3(Mathf.Cos(Mathf.Deg2Rad * i * 45 + offset), 0, Mathf.Sin(Mathf.Deg2Rad * i * 45 + offset));
-                obj.Rotation = new Vector3(Random.value * 360, Random.value * 360, Random.value * 360);
-                obj.Speed = 4;
+                playerData.ProjectilePool.Get()
+                    .Initialize(Projectile.ProjectileType.enemy, transform.position, new Vector3(Mathf.Cos(Mathf.Deg2Rad * i * 45 + offset), 0, Mathf.Sin(Mathf.Deg2Rad * i * 45 + offset)),
+                    rot: new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f)))
+                    .transform.parent = transform.parent;
             }
 
             AudioHandler.instance.PlaySound("Player_Shoot", audio, 0.7f);

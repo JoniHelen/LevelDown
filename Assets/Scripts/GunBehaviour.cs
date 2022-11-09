@@ -25,8 +25,6 @@ public class GunBehaviour : MonoBehaviour
     byte chargeState = 0;
     Vector3 dir = Vector3.forward;
 
-    List<Projectile> projectiles = new List<Projectile>();
-
     void Update()
     {
         transform.GetChild(0).localScale = Vector3.one * ((4 * charge + 3) / 10);
@@ -72,47 +70,22 @@ public class GunBehaviour : MonoBehaviour
     void Shoot()
     {
         InitProjectiles((player.powerupMask & PlayerMovement.PowerupMask.Multishot) != 0);
-
-        if ((player.powerupMask & PlayerMovement.PowerupMask.DamageBoost) != 0)
-            BuffDamage();
-
         AudioHandler.instance.PlaySound("Player_Shoot", audio);
     }
 
-    void BuffDamage() => projectiles.ForEach(p => p.Damage = 3);
-
     void InitProjectiles(bool multi)
     {
-        projectiles.Clear();
-
-        Projectile p1 = playerData.ProjectilePool.Get();
-        p1.Initialize()
+        playerData.ProjectilePool.Get()
+            .Initialize(Projectile.ProjectileType.player, gun.transform.position, dir, player.powerupMask);
 
         if (multi)
         {
-            p1.Initialize(dir);
-            p1.Shake = true;
+            playerData.ProjectilePool.Get()
+                .Initialize(Projectile.ProjectileType.player, gun.transform.position, Quaternion.AngleAxis(17.5f, Vector3.up) * dir, player.powerupMask);
 
-            Projectile p2 = Instantiate(projectile, gun.transform.position, Quaternion.Euler(0, 0, 0));
-            p2.Direction = Quaternion.AngleAxis(17.5f, Vector3.up) * dir.normalized;
-            p2.Rotation = Vector3.zero;
-            p2.Shake = true;
-
-            projectiles.Add(p2);
-
-            Projectile p3 = Instantiate(projectile, gun.transform.position, Quaternion.Euler(0, 0, 0));
-            p3.Direction = Quaternion.AngleAxis(-17.5f, Vector3.up) * dir.normalized;
-            p3.Rotation = Vector3.zero;
-            p3.Shake = true;
-
-            projectiles.Add(p3);
+            playerData.ProjectilePool.Get()
+                .Initialize(Projectile.ProjectileType.player, gun.transform.position, Quaternion.AngleAxis(-17.5f, Vector3.up) * dir, player.powerupMask);
         }
-        else
-        {
-
-        }
-
-        projectiles.Add(p1);
     }
 
     public void PrimaryFire(InputAction.CallbackContext ctx)
@@ -174,12 +147,12 @@ public class GunBehaviour : MonoBehaviour
     {
         if (charge >= chargeNeeded && playerData.charges > 0 && canShoot)
         {
-            Projectile obj = Instantiate(projectile, gun.transform.position, Quaternion.Euler(0, 0, 0));
-            AudioHandler.instance.PlaySound("Charged_Shot", audio);
-            obj.Direction = dir;
-            obj.transform.localScale = transform.GetChild(0).localScale;
-            obj.Charged = true;
+            playerData.ProjectilePool.Get()
+                .Initialize(Projectile.ProjectileType.player, gun.transform.position, dir, player.powerupMask, true)
+                .transform.localScale = transform.GetChild(0).localScale;
+
             playerData.RemoveCharges(1);
+            AudioHandler.instance.PlaySound("Charged_Shot", audio);
             GameHandler.instance.uiManager.UpdateCharges();
         }
         charge = 0;
