@@ -186,7 +186,6 @@ public class Projectile : MonoBehaviour // POOLED
                 // Spawn player particles and destroy them with self
                 //GameObject obj = Instantiate(playerExplosion, transform.position, Quaternion.Euler(0, 0, 0));
                 //Destroy(obj, 1f);
-                Debug.Log(collision.gameObject);
                 FlagAsDestroyed();
             }
             else if (collision.gameObject.CompareTag("Level") || collision.gameObject.CompareTag("Wall")) // If projectile hits level
@@ -215,7 +214,6 @@ public class Projectile : MonoBehaviour // POOLED
                     //Destroy(obj, 1f);
                     collision.gameObject.TryGetComponent(out GroundBehaviour gb);
                     if (gb != null) gb.FlashColor();
-                    Debug.Log(collision.gameObject);
                     FlagAsDestroyed();
                 }
                 else
@@ -245,8 +243,6 @@ public class Projectile : MonoBehaviour // POOLED
                     //Destroy(obj, 1f);
                     collision.gameObject.TryGetComponent(out GroundBehaviour gb);
                     if (gb != null) gb.FlashColor();
-                    
-                    Debug.Log(collision.gameObject);
                     FlagAsDestroyed();
                 }
             }
@@ -254,9 +250,18 @@ public class Projectile : MonoBehaviour // POOLED
         
     }
 
+    Color RandomColor
+    {
+        get
+        {
+            Vector3 v = new Vector3(Random.value, Random.value, Random.value).normalized;
+            return new Color(v.x, v.y, v.z);
+        }
+    }
+
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
+        Gizmos.color = RandomColor;
         foreach (ContactPoint p in points)
             Gizmos.DrawSphere(p.point, 0.1f);
     }

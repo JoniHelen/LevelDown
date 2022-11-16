@@ -87,9 +87,8 @@ public class EnemyMovement : MonoBehaviour
         {
             Vector3 dir = (playerData.position - transform.position).normalized;
             dir.y = 0;
-            playerData.ProjectilePool.Get()
-                .Initialize(Projectile.ProjectileType.enemy, transform.position, dir, rot: new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f)))
-                .transform.parent = transform.parent;
+            /*playerData.ProjectilePool.Get()
+                .Initialize(Projectile.ProjectileType.enemy, transform.position, dir, rot: new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f)));*/
 
             AudioHandler.instance.PlaySound("Player_Shoot", audio, 0.7f);
             yield return new WaitForSeconds(1);
@@ -182,10 +181,9 @@ public class EnemyMovement : MonoBehaviour
 
             for (int i = 0; i < 8; i++)
             {
-                playerData.ProjectilePool.Get()
+                /*playerData.ProjectilePool.Get()
                     .Initialize(Projectile.ProjectileType.enemy, transform.position, new Vector3(Mathf.Cos(Mathf.Deg2Rad * i * 45 + offset), 0, Mathf.Sin(Mathf.Deg2Rad * i * 45 + offset)),
-                    rot: new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f)))
-                    .transform.parent = transform.parent;
+                    rot: new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f)));*/
             }
 
             AudioHandler.instance.PlaySound("Player_Shoot", audio, 0.7f);

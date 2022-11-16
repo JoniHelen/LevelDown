@@ -135,9 +135,11 @@ public class GunBehaviour : MonoBehaviour
 
     public void StickAim(InputAction.CallbackContext ctx)
     {
-        if (ctx.ReadValue<Vector2>() != Vector2.zero)
+        Vector2 input = ctx.ReadValue<Vector2>();
+
+        if (input != Vector2.zero)
         {
-            dir = new Vector3(ctx.ReadValue<Vector2>().x, 0, ctx.ReadValue<Vector2>().y).normalized;
+            dir = new Vector3(input.x, 0, input.y).normalized;
 
             transform.rotation = Quaternion.LookRotation(dir);
         }
