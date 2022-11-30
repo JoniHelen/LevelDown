@@ -15,7 +15,6 @@ public class Projectile : MonoBehaviour // POOLED
 
     MeshFilter meshFilter;
     Renderer rend;
-    Rigidbody rb;
     ProjectileType projType;
     Vector3 Direction = Vector3.zero;
     Vector3 Rotation = Vector3.zero;
@@ -29,12 +28,13 @@ public class Projectile : MonoBehaviour // POOLED
     ContactPoint[] points;
 
     public float Speed;
+    [SerializeField] LayerMask CollisionMask;
     [SerializeField] Mesh playerMesh;
     [SerializeField] Mesh enemyMesh;
     [SerializeField] Material playerMaterial;
     [SerializeField] Material enemyMaterial;
     [SerializeField] ParticleSystem particles;
-    [SerializeField] SphereCollider sphereCollider;
+    //[SerializeField] SphereCollider sphereCollider;
     [SerializeField] CinemachineImpulseSource impulse;
     [SerializeField] SO_GameData playerData;
 
@@ -69,23 +69,24 @@ public class Projectile : MonoBehaviour // POOLED
     {
         meshFilter = GetComponent<MeshFilter>();
         rend = GetComponent<Renderer>();
-        rb = GetComponent<Rigidbody>();
     }
 
     void Update()
     {
         if (!Destroyed)
         {
+            Move();
             //transform.Translate(Speed * Time.deltaTime * Direction.normalized, Space.World);
-            transform.Rotate(Rotation * Time.deltaTime, Space.Self);
+            //transform.Rotate(Rotation * Time.deltaTime, Space.Self);
         }
     }
 
     private void OnEnable()
     {
         Destroyed = false;
-        sphereCollider.enabled = true;
+        //sphereCollider.enabled = true;
         rend.enabled = true;
+        damageDealt = false;
     }
 
     private void OnParticleSystemStopped()
@@ -96,8 +97,7 @@ public class Projectile : MonoBehaviour // POOLED
     public Projectile Initialize(ProjectileType type, Vector3 pos, Vector3 dir, PlayerMovement.PowerupMask powerups = PlayerMovement.PowerupMask.None, bool charged = false, Vector3 rot = default)
     {
         Type = type;
-        transform.position = pos;
-        rb.velocity = Speed * dir;
+        transform.SetPositionAndRotation(pos, Quaternion.identity);
         Direction = dir;
         Rotation = rot;
         DamageBoost = (powerups & PlayerMovement.PowerupMask.DamageBoost) != 0;
@@ -110,14 +110,73 @@ public class Projectile : MonoBehaviour // POOLED
     private void FlagAsDestroyed()
     {
         Destroyed = true;
-        sphereCollider.enabled = false;
+        //sphereCollider.enabled = false;
         rend.enabled = false;
-        rb.velocity = Vector3.zero;
+        transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
         particles.Play();
     }
 
-    // TODO: IMPLEMENT AUDIO ON HIT
+    private void Move()
+    {
+        float distance = Speed * Time.deltaTime;
+        if (Physics.SphereCast(transform.position, transform.localScale.x / 2, Direction, out RaycastHit hit, distance, CollisionMask))
+            SolveCollision(hit);
+        else
+            transform.Translate(distance * Direction, Space.World);
+    }
 
+    private void SolveCollision(RaycastHit hit)
+    {
+        if (!Destroyed)
+            switch(Type)
+            {
+                case ProjectileType.player:
+                    GameObject hitObj = hit.collider.gameObject;
+                    if (hitObj.layer == LayerMask.NameToLayer("Enemy") && !damageDealt)
+                    {
+                        damageDealt = true;
+                        transform.Translate(hit.distance * Direction, Space.World);
+                        if (Charged)
+                        {
+                            impulse.GenerateImpulse(0.7f);
+                            GameHandler.instance.LargeRumble();
+                            hitObj.GetComponent<EnemyMovement>().TakeDamage(Damage + 3, Direction, Charged);
+                        }
+                        else
+                        {
+                            impulse.GenerateImpulse(0.2f);
+                            GameHandler.instance.SmallRumble();
+                            hitObj.GetComponent<EnemyMovement>().TakeDamage(Damage, Direction, Charged);
+                        }
+                    }
+                    else
+                    {
+                        if (Charged)
+                        {
+                            impulse.GenerateImpulse(0.7f);
+                            GameHandler.instance.LargeRumble();
+                        }
+                        else if (Shake)
+                        {
+                            impulse.GenerateImpulse(0.2f);
+                            GameHandler.instance.SmallRumble();
+                        }
+
+                        if (hitObj.TryGetComponent(out GroundBehaviour gb))
+                            gb.FlashColor();
+                    }
+                    FlagAsDestroyed();
+                    break;
+
+                case ProjectileType.enemy:
+                    break;
+                default:
+                    break;
+            }
+    }
+
+    // TODO: IMPLEMENT AUDIO ON HIT
+    /*
     private void OnCollisionEnter(Collision collision)
     {
         points = collision.contacts;
@@ -178,7 +237,7 @@ public class Projectile : MonoBehaviour // POOLED
                 {
                     //f.GetComponent<ColorExplosion>().Charged = false;
                     // Enemy takes damage
-                    /*if (shake)*/ impulse.GenerateImpulse(0.2f);
+                    impulse.GenerateImpulse(0.2f);
                     GameHandler.instance.SmallRumble();
                     collision.gameObject.GetComponent<EnemyMovement>().TakeDamage(Damage, Direction, Charged);
                 }
@@ -212,8 +271,6 @@ public class Projectile : MonoBehaviour // POOLED
 
                     // Destroy particles and self
                     //Destroy(obj, 1f);
-                    collision.gameObject.TryGetComponent(out GroundBehaviour gb);
-                    if (gb != null) gb.FlashColor();
                     FlagAsDestroyed();
                 }
                 else
@@ -248,7 +305,7 @@ public class Projectile : MonoBehaviour // POOLED
             }
         }
         
-    }
+    }*/
 
     Color RandomColor
     {
@@ -262,7 +319,8 @@ public class Projectile : MonoBehaviour // POOLED
     private void OnDrawGizmos()
     {
         Gizmos.color = RandomColor;
-        foreach (ContactPoint p in points)
-            Gizmos.DrawSphere(p.point, 0.1f);
+        if (points != null)
+            foreach (ContactPoint p in points)
+                Gizmos.DrawSphere(p.point, 0.1f);
     }
 }

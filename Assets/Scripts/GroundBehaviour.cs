@@ -99,8 +99,8 @@ public class GroundBehaviour : MonoBehaviour // POOLED
 
     void SetColorAndStrength(Color color, float strength)
     {
-        block.SetColor("Emission_Color", color);
-        block.SetFloat("Emission_Strength", strength);
+        block.SetColor("_EmissionColor", color);
+        block.SetFloat("_EmissionStrength", strength);
         rend.SetPropertyBlock(block);
     }
 

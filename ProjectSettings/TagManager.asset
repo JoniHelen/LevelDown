@@ -21,10 +21,10 @@ TagManager:
   - WalkableArea
   - RayCatch
   - No PP
-  - 
-  - 
-  - 
-  - 
+  - Player
+  - Enemy
+  - Wall
+  - Level
   - 
   - 
   - 
