@@ -18,14 +18,13 @@ public class Projectile : MonoBehaviour // POOLED
     ProjectileType projType;
     Vector3 Direction = Vector3.zero;
     Vector3 Rotation = Vector3.zero;
+    bool damageDealt = false;
     bool Destroyed = false;
-    bool Charged;
-    bool DamageBoost;
-    bool Shake;
+    bool Charged = false;
+    bool DamageBoost = false;
+    bool Shake = false;
     int BaseDamage = 1;
     int Damage = 1;
-
-    ContactPoint[] points;
 
     public float Speed;
     [SerializeField] LayerMask CollisionMask;
@@ -34,11 +33,8 @@ public class Projectile : MonoBehaviour // POOLED
     [SerializeField] Material playerMaterial;
     [SerializeField] Material enemyMaterial;
     [SerializeField] ParticleSystem particles;
-    //[SerializeField] SphereCollider sphereCollider;
     [SerializeField] CinemachineImpulseSource impulse;
     [SerializeField] SO_GameData playerData;
-
-    bool damageDealt = false;
 
     public ProjectileType Type
     {
@@ -74,17 +70,12 @@ public class Projectile : MonoBehaviour // POOLED
     void Update()
     {
         if (!Destroyed)
-        {
             Move();
-            //transform.Translate(Speed * Time.deltaTime * Direction.normalized, Space.World);
-            //transform.Rotate(Rotation * Time.deltaTime, Space.Self);
-        }
     }
 
     private void OnEnable()
     {
         Destroyed = false;
-        //sphereCollider.enabled = true;
         rend.enabled = true;
         damageDealt = false;
     }
@@ -110,7 +101,6 @@ public class Projectile : MonoBehaviour // POOLED
     private void FlagAsDestroyed()
     {
         Destroyed = true;
-        //sphereCollider.enabled = false;
         rend.enabled = false;
         transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
         particles.Play();
@@ -123,6 +113,9 @@ public class Projectile : MonoBehaviour // POOLED
             SolveCollision(hit);
         else
             transform.Translate(distance * Direction, Space.World);
+
+        if (Type == ProjectileType.enemy)
+            transform.Rotate(Rotation * Time.deltaTime, Space.World);
     }
 
     private void SolveCollision(RaycastHit hit)
@@ -132,7 +125,7 @@ public class Projectile : MonoBehaviour // POOLED
             {
                 case ProjectileType.player:
                     GameObject hitObj = hit.collider.gameObject;
-                    if (hitObj.layer == LayerMask.NameToLayer("Enemy") && !damageDealt)
+                    if (hitObj.TryGetComponent(out EnemyMovement enemy) && !damageDealt)
                     {
                         damageDealt = true;
                         transform.Translate(hit.distance * Direction, Space.World);
@@ -140,19 +133,23 @@ public class Projectile : MonoBehaviour // POOLED
                         {
                             impulse.GenerateImpulse(0.7f);
                             GameHandler.instance.LargeRumble();
-                            hitObj.GetComponent<EnemyMovement>().TakeDamage(Damage + 3, Direction, Charged);
+                            enemy.TakeDamage(Damage + 3, Direction, Charged);
                         }
                         else
                         {
                             impulse.GenerateImpulse(0.2f);
                             GameHandler.instance.SmallRumble();
-                            hitObj.GetComponent<EnemyMovement>().TakeDamage(Damage, Direction, Charged);
+                            enemy.TakeDamage(Damage, Direction, Charged);
                         }
                     }
                     else
                     {
+                        if (hitObj.TryGetComponent(out GroundBehaviour gb))
+                            gb.FlashColor();
+
                         if (Charged)
                         {
+                            if (gb != null) gb.Type = GroundBehaviour.GroundType.Short;
                             impulse.GenerateImpulse(0.7f);
                             GameHandler.instance.LargeRumble();
                         }
@@ -162,8 +159,6 @@ public class Projectile : MonoBehaviour // POOLED
                             GameHandler.instance.SmallRumble();
                         }
 
-                        if (hitObj.TryGetComponent(out GroundBehaviour gb))
-                            gb.FlashColor();
                     }
                     FlagAsDestroyed();
                     break;
@@ -314,13 +309,5 @@ public class Projectile : MonoBehaviour // POOLED
             Vector3 v = new Vector3(Random.value, Random.value, Random.value).normalized;
             return new Color(v.x, v.y, v.z);
         }
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = RandomColor;
-        if (points != null)
-            foreach (ContactPoint p in points)
-                Gizmos.DrawSphere(p.point, 0.1f);
     }
 }

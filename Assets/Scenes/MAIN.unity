@@ -3514,6 +3514,7 @@ MonoBehaviour:
   height: 18
   offsetX: -15.5
   offsetY: -8
+  RandomRate: 20
   currentLevel: {fileID: 0}
   levelCreated: 0
   themePlaying: 0

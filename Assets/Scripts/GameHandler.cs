@@ -5,6 +5,7 @@ using UnityEngine.Events;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
+using UniRx;
 
 public class GameHandler : MonoBehaviour
 {
@@ -25,6 +26,8 @@ public class GameHandler : MonoBehaviour
 
     [SerializeField] float offsetX;
     [SerializeField] float offsetY;
+
+    [SerializeField] float RandomRate;
 
     float time = 0;
 
@@ -47,6 +50,10 @@ public class GameHandler : MonoBehaviour
     public UI_Manager uiManager;
 
     public List<GameObject> Enemies = new List<GameObject>();
+
+
+    float randomElapsed = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -65,6 +72,22 @@ public class GameHandler : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+
+        Observable.FromMicroCoroutine(UpdateScreenRandom, false, FrameCountType.EndOfFrame).Subscribe().AddTo(this);
+    }
+
+    private IEnumerator UpdateScreenRandom()
+    {
+        while (true)
+        {
+            randomElapsed = 0;
+            screenGlitch.SetVector("_RandomSeed", new Vector2(Random.value, Random.value));
+            while (randomElapsed < 1 / RandomRate)
+            {
+                randomElapsed += Time.unscaledDeltaTime;
+                yield return null;
+            }
         }
     }
 
@@ -130,7 +153,7 @@ public class GameHandler : MonoBehaviour
 
     IEnumerator FlashGlitch()
     {
-        float original = screenGlitch.GetFloat("Intensity");
+        float original = screenGlitch.GetFloat("_Intensity");
         float peak = 0.1f;
 
         float delta = peak - original;
@@ -139,12 +162,12 @@ public class GameHandler : MonoBehaviour
 
         while (duration > 0)
         {
-            screenGlitch.SetFloat("Intensity", original + delta * duration);
+            screenGlitch.SetFloat("_Intensity", original + delta * duration);
             duration -= Time.deltaTime * 10;
             yield return new WaitForEndOfFrame();
         }
 
-        screenGlitch.SetFloat("Intensity", original);
+        screenGlitch.SetFloat("_Intensity", original);
     }
 
     IEnumerator GameOver()
@@ -204,7 +227,7 @@ public class GameHandler : MonoBehaviour
 
     public void SetGlitchAmount(float amount)
     {
-        screenGlitch.SetFloat("Intensity", amount);
+        screenGlitch.SetFloat("_Intensity", amount);
     }
 
     public void FlashScreenGlitch()
