@@ -45,11 +45,6 @@ public class GroundBehaviour : MonoBehaviour // POOLED
             SetColorAndStrength(value, Glow);
         }
     }
-    Color RandomColor { get {
-            Vector3 v = new Vector3(Random.value, Random.value, Random.value).normalized;
-            return new Color(v.x, v.y, v.z);
-        }
-    }
     public GroundType Type { 
         get { return groundType; } 
         set 
@@ -106,12 +101,15 @@ public class GroundBehaviour : MonoBehaviour // POOLED
 
     public void StartDestruction()
     {
-        if (!Destroyed) MainThreadDispatcher.StartEndOfFrameMicroCoroutine(Destruction(RandomColor));
+        if (!Destroyed)
+        {
+            Destroyed = true;
+            MainThreadDispatcher.StartEndOfFrameMicroCoroutine(Destruction(RandomColor.Get()));
+        }
     }
     IEnumerator Destruction(Color flashColor)
     {
         float t = 0;
-        Destroyed = true;
         rb.useGravity = true;
         rb.isKinematic = false;
 
@@ -125,7 +123,7 @@ public class GroundBehaviour : MonoBehaviour // POOLED
         SetColorAndStrength(GroundColor, 0);
         gameData.GroundPool.Release(this);
     }
-    public void FlashColor() => MainThreadDispatcher.StartEndOfFrameMicroCoroutine(Flash(RandomColor));
+    public void FlashColor() => MainThreadDispatcher.StartEndOfFrameMicroCoroutine(Flash(RandomColor.Get()));
     public void FlashColor(Color col) => MainThreadDispatcher.StartEndOfFrameMicroCoroutine(Flash(col));
     IEnumerator Flash(Color flashColor)
     {

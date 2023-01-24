@@ -301,13 +301,4 @@ public class Projectile : MonoBehaviour // POOLED
         }
         
     }*/
-
-    Color RandomColor
-    {
-        get
-        {
-            Vector3 v = new Vector3(Random.value, Random.value, Random.value).normalized;
-            return new Color(v.x, v.y, v.z);
-        }
-    }
 }

@@ -8,22 +8,20 @@ public class Pickup : MonoBehaviour
     public enum PickupType { HP, Multishot, DamageBoost }
 
     public PickupType type;
-
     public float Duration;
-    [HideInInspector] public float activeTime = 0;
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Player"))
+        if (other.TryGetComponent(out PlayerMovement pm))
         {
             if (type == PickupType.HP)
             {
-                other.gameObject.GetComponent<PlayerMovement>().OnHeal();
+                pm.OnHeal();
                 Destroy(gameObject);
             }
             else
             {
-                other.gameObject.GetComponent<PlayerMovement>().OnPickupPowerup(this);
+                pm.OnPickupPowerup(this);
                 Destroy(gameObject);
             }
         }
@@ -33,14 +31,17 @@ public class Pickup : MonoBehaviour
 
     public void OnLevelDown()
     {
-        RaycastHit[] hits = Physics.SphereCastAll(transform.position + Vector3.down * 2, GetComponent<SphereCollider>().radius * transform.localScale.z, Camera.main.transform.forward, Mathf.Infinity);
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position + Vector3.down * 2, GetComponent<SphereCollider>().radius * transform.localScale.z, Vector3.down, Mathf.Infinity);
 
         foreach (RaycastHit hit in hits)
         {
-            if(hit.transform.localScale.y == 2)
+            if(hit.collider.TryGetComponent(out GroundBehaviour gb))
             {
-                Destroy(gameObject);
-                break;
+                if (gb.Type == GroundBehaviour.GroundType.Tall)
+                {
+                    Destroy(gameObject);
+                    break;
+                }
             }
         }
     }

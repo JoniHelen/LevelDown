@@ -126,8 +126,9 @@ public class GunBehaviour : MonoBehaviour
 
         if (Physics.Raycast(r, out RaycastHit rh, Mathf.Infinity, rayMask, QueryTriggerInteraction.Collide))
         {
-            dir = (rh.point - player.transform.position).normalized;
-            dir.y = 0;
+            // TODO: Make mouse position update insted of direction
+            Vector3 d = rh.point - player.transform.position;
+            dir = new Vector3(d.x, 0, d.z).normalized;
 
             transform.rotation = Quaternion.LookRotation(dir);
         }
