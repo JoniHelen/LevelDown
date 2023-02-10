@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.HID;
+using UnityEngine.InputSystem.DualShock;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -18,6 +20,8 @@ public class PlayerMovement : MonoBehaviour
     public bool canTakeDamage = true;
 
     public List<PickupData> pickups = new List<PickupData>();
+
+    DualSenseGamepadHID gamepad;
 
     [Flags]
     public enum PowerupMask

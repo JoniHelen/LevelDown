@@ -9,6 +9,7 @@ using UniRx;
 
 public class GameHandler : MonoBehaviour
 {
+    [SerializeField] private RenderToCustomTexture rtc;
     [SerializeField] GameObject level;
     [SerializeField] GameObject wall;
     [SerializeField] LevelDestroyer transition;
@@ -59,6 +60,7 @@ public class GameHandler : MonoBehaviour
     {
         input = player.GetComponent<PlayerInput>();
         Cursor.lockState = CursorLockMode.Confined;
+        rtc.UpdateTexture();
         GenerateWalls();
         StartGame();
     }

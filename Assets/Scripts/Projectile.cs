@@ -63,6 +63,7 @@ public class Projectile : MonoBehaviour // POOLED
 
     private void Awake()
     {
+        Time.timeScale = 0.25f;
         meshFilter = GetComponent<MeshFilter>();
         rend = GetComponent<Renderer>();
     }
